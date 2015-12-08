@@ -8,10 +8,11 @@ class Parking(models.Model):
     type = models.CharField(max_length=150)
     label = models.CharField(max_length=500)
     places_of_interest = models.TextField()
+    uri = models.TextField()
 
 
 class RateType(models.Model):
-    parkingID = models.ForeignKey(Parking, on_delete=models.CASCADE)
+    parkingID = models.ForeignKey(Parking, on_delete=models.CASCADE, db_column='parkingID')
     rateID = models.AutoField(primary_key=True, unique=True)
     day_of_week = models.CharField(max_length=50)
     start_time = models.TimeField()
@@ -20,6 +21,6 @@ class RateType(models.Model):
 
 
 class RatePrices(models.Model):
-    rateID = models.ForeignKey(RateType, on_delete=models.CASCADE)
+    rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
     duration = models.IntegerField(default=0)
     price = models.CharField(max_length=50)
