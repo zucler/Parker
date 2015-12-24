@@ -26,6 +26,7 @@ class RateType(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     type = models.CharField(max_length=50, choices=RATE_TYPES)
+    label = models.CharField(max_length=50,default="")
 
 
 class RatePrices(models.Model):
