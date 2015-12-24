@@ -1,12 +1,14 @@
 __author__ = 'Maxim Pak'
 
+import parker.wsgi
+
 from contextlib import closing
 
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
 from parker.parser import WillsonsRatesParser
-
+from parker.models import Parking, RateType, RatePrices
 
 url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
 

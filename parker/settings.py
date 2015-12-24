@@ -22,8 +22,6 @@ SECRET_KEY = '+56vp3(=hfhqu-l5c$jn!308lv*)#^5#q)i7i37l8_o!t$jxmf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -36,7 +34,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'polls'
+    'polls',
+    'parker'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -93,6 +92,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
