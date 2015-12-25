@@ -50,9 +50,6 @@ class WillsonsRates(Rates):
             self.types[section_name] = self._get_rate_type_info(section_name, rates)
             self.rates[section_name] = self._extract_prices_from_raw_list(section_name, rates)
 
-        print(self.types)
-        exit()
-
     def _get_rate_type_info(self, section_name, rates):
         """Get information for a rate type (start/end times & rate type)
 
@@ -71,7 +68,9 @@ class WillsonsRates(Rates):
                     rate_times = re.compile("[0-9:]*am").findall(string)
                     rate_type['start'] = Utils.convert_to_24h_format(rate_times[0])
                     rate_type['end'] = Utils.convert_to_24h_format(rate_times[1])
-
+                    notes_array = string.split(",")
+                    rate_type['notes'] = notes_array[1].strip().capitalize()
+  
         if section_name == "Night":
             for string in rates:
                 if Utils.string_found("Entry after", string):
