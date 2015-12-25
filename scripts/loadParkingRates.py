@@ -5,6 +5,7 @@ from contextlib import closing
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
+import parker.wsgi
 from parker.models import Parking, RateType
 from parker.parser import WillsonsRatesParser
 
@@ -43,5 +44,5 @@ for carpark in carparkings:
                 carpark_rate_type.end_time = "23:59"
                 carpark_rate_type.day_of_week = "Sun"
 
-            carpark_rate_type.save()
-            print("Carpark rate id is " + str(carpark_rate_type.rateID))
+                # carpark_rate_type.save()
+                # print("Carpark rate id is " + str(carpark_rate_type.rateID))
