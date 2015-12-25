@@ -5,6 +5,7 @@ from contextlib import closing
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
+import parker.wsgi
 from parker.models import Parking, RateType
 from parker.parser import WillsonsRatesParser
 
