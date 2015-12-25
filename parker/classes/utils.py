@@ -1,5 +1,6 @@
 __author__ = 'Maxim Pak'
 import re
+from datetime import datetime
 
 
 class Utils:
@@ -36,3 +37,24 @@ class Utils:
                 return True
 
         return False
+
+    @staticmethod
+    def convert_to_24h_format(time):
+        """Convert HH:MM, HH or H 12 hours time into 24 HH:MM format
+
+        Args:
+            time (string): Time in HH:MM, HH or H 12 hours format
+
+        Returns:
+            Returns string representing time in HH:MM 24 hours format
+        """
+        hours_minutes_12_format = "%I:%M%p"
+        hours_only_12_format = "%I%p"
+        hours_minutes_24_format = "%H:%M"
+
+        try:
+            time = datetime.strptime(time, hours_minutes_12_format).strftime(hours_minutes_24_format)
+        except ValueError:
+            time = datetime.strptime(time, hours_only_12_format).strftime(hours_minutes_24_format)
+
+        return time
