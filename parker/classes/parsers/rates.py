@@ -70,7 +70,7 @@ class WillsonsRates(Rates):
                     rate_type['end'] = Utils.convert_to_24h_format(rate_times[1])
                     notes_array = string.split(",")
                     rate_type['notes'] = notes_array[1].strip().capitalize()
-  
+
         if section_name == "Night":
             for string in rates:
                 if Utils.string_found("Entry after", string):
@@ -85,6 +85,12 @@ class WillsonsRates(Rates):
         if section_name == "Weekend":
             rate_type['start'] = "00:00"
             rate_type['end'] = "23:59"
+
+        rate_type['days_range'] = []
+        for i in range(0, len(rates)):
+            line = rates[i]
+            if self.is_a_day(line):
+                rate_type['days_range'].extend(self._detect_days_in_range(line))
 
         rate_type['type'] = self._detect_rates_type(rates)
 
@@ -159,7 +165,7 @@ class WillsonsRates(Rates):
                 break
 
             # Process hourly section
-            if self.types[section_name] == "Hourly":
+            if self.types[section_name]['type'] == "Hourly":
 
                 if Utils.string_found('hrs', line):
                     hours_str = self._format_hours_line(line)
@@ -178,7 +184,7 @@ class WillsonsRates(Rates):
                         prices[str(current_hourly_minutes) + "+"] = prices_str
 
             # Process flat price section
-            if self.types[section_name] == "Flat":
+            if self.types[section_name]['type'] == "Flat":
                 if self.is_a_day(line):
                     days_range = self._detect_days_in_range(line)
                     flat_price = self._format_prices_line(next_line)

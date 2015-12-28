@@ -31,5 +31,5 @@ class RateType(models.Model):
 
 class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
-    duration = models.IntegerField(default=0)
+    duration = models.CharField(max_length=50)
     price = models.CharField(max_length=50)
