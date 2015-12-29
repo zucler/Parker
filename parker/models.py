@@ -26,9 +26,10 @@ class RateType(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     type = models.CharField(max_length=50, choices=RATE_TYPES)
+    label = models.CharField(max_length=50,default="")
 
 
-class RatePrices(models.Model):
+class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
-    duration = models.IntegerField(default=0)
+    duration = models.CharField(max_length=50)
     price = models.CharField(max_length=50)

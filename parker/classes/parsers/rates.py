@@ -1,6 +1,7 @@
 __author__ = 'Maxim Pak'
 
 import collections
+import re
 
 from parker.classes.utils import Utils
 
@@ -46,8 +47,54 @@ class WillsonsRates(Rates):
                 raw_rates (array): Array of unformatted rates
         """
         for (section_name, rates) in raw_rates.items():
-            self.types[section_name] = self._detect_rates_type(rates)
+            self.types[section_name] = self._get_rate_type_info(section_name, rates)
             self.rates[section_name] = self._extract_prices_from_raw_list(section_name, rates)
+
+    def _get_rate_type_info(self, section_name, rates):
+        """Get information for a rate type (start/end times & rate type)
+
+        Args:
+            section_name (str): Name of the rate section (e.g. Early Bird, Night)
+            rates: (list): List of HTML entries for the section given
+
+        Returns:
+            Returns dictionary of information for a rate
+        """
+        rate_type = {}
+
+        if section_name == "Early Bird":
+            for string in rates:
+                if Utils.string_found("Entry between", string):
+                    rate_times = re.compile("[0-9:]*am").findall(string)
+                    rate_type['start'] = Utils.convert_to_24h_format(rate_times[0])
+                    rate_type['end'] = Utils.convert_to_24h_format(rate_times[1])
+                    notes_array = string.split(",")
+                    rate_type['notes'] = notes_array[1].strip().capitalize()
+
+        if section_name == "Night":
+            for string in rates:
+                if Utils.string_found("Entry after", string):
+                    rate_times = re.compile("[0-9:]*pm").findall(string)
+                    rate_type['start'] = Utils.convert_to_24h_format(rate_times[0])
+                    rate_type['end'] = "23:59"
+
+        if section_name == "Casual":
+            rate_type['start'] = "00:00"
+            rate_type['end'] = "23:59"
+
+        if section_name == "Weekend":
+            rate_type['start'] = "00:00"
+            rate_type['end'] = "23:59"
+
+        rate_type['days_range'] = []
+        for i in range(0, len(rates)):
+            line = rates[i]
+            if self.is_a_day(line):
+                rate_type['days_range'].extend(self._detect_days_in_range(line))
+
+        rate_type['type'] = self._detect_rates_type(rates)
+
+        return rate_type
 
     def _detect_rates_type(self, rates):
         """Detect type of the rates section
@@ -118,7 +165,7 @@ class WillsonsRates(Rates):
                 break
 
             # Process hourly section
-            if self.types[section_name] == "Hourly":
+            if self.types[section_name]['type'] == "Hourly":
 
                 if Utils.string_found('hrs', line):
                     hours_str = self._format_hours_line(line)
@@ -137,7 +184,7 @@ class WillsonsRates(Rates):
                         prices[str(current_hourly_minutes) + "+"] = prices_str
 
             # Process flat price section
-            if self.types[section_name] == "Flat":
+            if self.types[section_name]['type'] == "Flat":
                 if self.is_a_day(line):
                     days_range = self._detect_days_in_range(line)
                     flat_price = self._format_prices_line(next_line)
