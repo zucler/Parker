@@ -28,8 +28,24 @@ class RateType(models.Model):
     type = models.CharField(max_length=50, choices=RATE_TYPES)
     label = models.CharField(max_length=50,default="")
 
+    def __str__(self):
+        obj_label = self.parkingID.label + " - " + self.type + " - " + self.label
+
+        if self.day_of_week:
+            obj_label += " - " + self.day_of_week
+
+        return obj_label
+
 
 class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
     duration = models.CharField(max_length=50)
     price = models.CharField(max_length=50)
+
+    def __str__(self):
+        obj_label = self.rateID.__str__()
+
+        if self.rateID.type == "Hourly":
+            obj_label += " [" + self.duration + "]"
+
+        return obj_label
