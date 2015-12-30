@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample parking details</title>
+</head>
+<body>
+<h1>{{ parking.label }}</h1>
+{{ parking }}
+<br/>
+{% for rate_type in rates %}
+    {{ rate_type }}<br/>
+{% endfor %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+</body>
+</html>
+
