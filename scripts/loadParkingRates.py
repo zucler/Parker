@@ -29,19 +29,47 @@ for carpark in carparkings:
         for rate_name, rate_data in rates.types.items():
             if rate_data['type'] == "Flat":
                 for day_of_week in rate_data['days_range']:
-                    carpark_rate = RateType(parkingID=carpark, label=rate_name, type=rate_data['type'],
-                                            day_of_week=day_of_week, start_time=rate_data['start'],
-                                            end_time=rate_data['end'])
+                    save_carpark_rate = False
+                    carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_name,
+                                                                           type=rate_data['type'],
+                                                                           day_of_week=day_of_week)
+
+                    if carpark_rate.start_time != rate_data['start']:
+                        carpark_rate.start_time = rate_data['start']
+                        save_carpark_rate = True
+
+                    if carpark_rate.end_time != rate_data['end']:
+                        carpark_rate.end_time = rate_data['end']
+                        save_carpark_rate = True
+
+                    if save_carpark_rate:
+                        carpark_rate.save()
+
+                    carpark_rate_price, created = RatePrice.objects.get_or_create(rateID=carpark_rate, duration=0)
+                    if carpark_rate_price != rates.rates[rate_name][day_of_week]:
+                        carpark_rate_price.price = rates.rates[rate_name][day_of_week]
+                        carpark_rate_price.save()
+            elif rate_data['type'] == "Hourly":
+                carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_name,
+                                                                       type=rate_data['type'],
+                                                                       day_of_week="")
+
+                save_carpark_rate = False
+                if carpark_rate.start_time != rate_data['start']:
+                    carpark_rate.start_time = rate_data['start']
+                    save_carpark_rate = True
+
+                if carpark_rate.end_time != rate_data['end']:
+                    carpark_rate.end_time = rate_data['end']
+                    save_carpark_rate = True
+
+                if save_carpark_rate:
                     carpark_rate.save()
 
-                    carpark_rate_price = RatePrice(rateID=carpark_rate, duration=0,
-                                                   price=rates.rates[rate_name][day_of_week])
-                    carpark_rate_price.save()
-            elif rate_data['type'] == "Hourly":
-                carpark_rate = RateType(parkingID=carpark, label=rate_name, type=rate_data['type'], day_of_week="",
-                                        start_time=rate_data['start'], end_time=rate_data['end'])
-                carpark_rate.save()
-
                 for price in rates.rates[rate_name].items():
-                    carpark_rate_price = RatePrice(rateID=carpark_rate, duration=price[0], price=price[1])
-                    carpark_rate_price.save()
+                    carpark_rate_price, created = RatePrice.objects.get_or_create(rateID=carpark_rate,
+                                                                                  duration=price[0])
+
+                    if carpark_rate_price.price != price[1]:
+                        carpark_rate_price.price = price[1]
+                        carpark_rate_price.save()
