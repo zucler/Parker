@@ -10,7 +10,8 @@ class Parking(models.Model):
     parkingID = models.AutoField(primary_key=True, unique=True)
     label = models.CharField(max_length=500)
     address = models.TextField()
-    geo_location = models.CharField(max_length=200)
+    lat = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    lng = models.DecimalField(max_digits=10, decimal_places=6, default=0)
     type = models.CharField(max_length=150, choices=RATE_TYPES)
     places_of_interest = models.TextField()
     uri = models.TextField()
@@ -26,7 +27,7 @@ class RateType(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     type = models.CharField(max_length=50, choices=RATE_TYPES)
-    label = models.CharField(max_length=50,default="")
+    label = models.CharField(max_length=50, default="")
 
     def __str__(self):
         obj_label = self.parkingID.label + " - " + self.type + " - " + self.label
