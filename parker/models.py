@@ -38,7 +38,7 @@ class RateType(models.Model):
         return obj_label
 
     class Meta:
-        unique_together = ('parkingID', 'day_of_week', 'start_time', 'end_time', 'type')
+        unique_together = ('parkingID', 'day_of_week', 'type', 'label')
 
 
 class RatePrice(models.Model):
