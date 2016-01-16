@@ -1,10 +1,14 @@
 __author__ = 'Maxim Pak'
 
+import os
+import sys
 from contextlib import closing
 
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
+sys.path.append('/srv/prod/carparker')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 import parker.wsgi
 from parker.models import Parking, RateType, RatePrice
 from parker.parser import WillsonsRatesParser
@@ -30,7 +34,8 @@ for carpark in carparkings:
                                             end_time=rate_data['end'])
                     carpark_rate.save()
 
-                    carpark_rate_price = RatePrice(rateID=carpark_rate, duration=0, price=rates.rates[rate_name][day_of_week])
+                    carpark_rate_price = RatePrice(rateID=carpark_rate, duration=0,
+                                                   price=rates.rates[rate_name][day_of_week])
                     carpark_rate_price.save()
             elif rate_data['type'] == "Hourly":
                 carpark_rate = RateType(parkingID=carpark, label=rate_name, type=rate_data['type'], day_of_week="",
