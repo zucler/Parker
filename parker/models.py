@@ -37,6 +37,9 @@ class RateType(models.Model):
 
         return obj_label
 
+    class Meta:
+        unique_together = ('parkingID', 'day_of_week', 'start_time', 'end_time', 'type')
+
 
 class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
@@ -50,3 +53,6 @@ class RatePrice(models.Model):
             obj_label += " [" + self.duration + "]"
 
         return obj_label
+
+    class Meta:
+        unique_together = ('duration', 'rateID')
