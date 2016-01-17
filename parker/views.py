@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.template import loader
 from django.views import generic
+
 
 from .models import Parking, RateType, RatePrice
 
@@ -21,3 +23,9 @@ class DetailView(generic.DetailView):
 
         return context
 
+
+def search(request):
+    "Searching for parkings in given boundary"
+    template = loader.get_template("parker/search.html")
+    context = { "big": "small" }
+    return HttpResponse(template.render(context, request))
