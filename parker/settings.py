@@ -34,7 +34,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
-    'polls',
     'parker',
     'rest_framework',
     'static_precompiler',
