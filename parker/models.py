@@ -46,12 +46,12 @@ class RateType(models.Model):
 class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
     duration = models.IntegerField()
-    price = models.CharField(max_length=50)     #TODO: Make decimal here
+    price = models.DecimalField(max_digits=10, decimal_places=6, default=0)
 
     def __str__(self):
         obj_label = self.rateID.__str__()
 
-        if self.rateID.type == "Hourly":        # TODO: Possibly deprecated
+        if self.rateID.type == "Hourly":
             obj_label += " [" + str(self.duration) + "]"
 
         return obj_label
