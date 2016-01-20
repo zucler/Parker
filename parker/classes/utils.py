@@ -1,4 +1,5 @@
 __author__ = 'Maxim Pak'
+import pprint
 import re
 from datetime import datetime
 
@@ -58,3 +59,33 @@ class Utils:
             time = datetime.strptime(time, hours_only_12_format).strftime(hours_minutes_24_format)
 
         return time
+
+    @staticmethod
+    def pprint(to_print):
+        """ Pretty prints variable
+        Args:
+            to_print (mixed): Variable to print
+
+        Returns:
+            void
+        """
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(to_print)
+
+    @staticmethod
+    def day_string_to_digit(day_string):
+        days = {
+            1: ("mon", "monday"),
+            2: ("tue", "tuesday"),
+            3: ("wed", "wednesday"),
+            4: ("thu", "thursday"),
+            5: ("fri", "friday"),
+            6: ("sat", "saturday"),
+            7: ("sun", "sunday")
+        }
+
+        for day_number in days.keys():
+            if day_string.lower() in days[day_number]:
+                return day_number
+
+        return False
