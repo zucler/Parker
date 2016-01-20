@@ -1,5 +1,5 @@
 __author__ = 'Maxim Pak'
-
+import re
 from html.parser import HTMLParser
 
 from parker.classes.parsers.rates import WillsonsRates
@@ -73,6 +73,44 @@ class Parser(HTMLParser):
             self.__content += "</" + tag + ">"
             self.__headerOpen = False
 
+    def get_prices_information(self, html):
+        """Process html code to build and return a parking rates object
+
+        Args:
+                html (str): Parking page html that includes parking info
+
+        Returns:
+                Returns Rates object that contain parking rates information
+        """
+        pass
+
+    def split_rates_by_sections(self, start_tag, html):
+        """Splits html by pattern into a dictionary of sub sections
+
+        Args:
+            start_tag (str): Opening HTML tag for a section (e.g. <h3>)
+            html (str): HTML to be breakdown
+
+        Returns:
+            Returns dictionary where key is section header and value is section content
+        """
+        sections_dict = {}
+        end_tag = start_tag[:1] + "/" + start_tag[1:]
+        pattern = re.escape(start_tag) + ".+" + re.escape(end_tag)
+        section_names = re.findall(pattern, html)
+        rates_list = re.split(pattern, html)
+        i = 0
+        for key in section_names:
+            key = key.lstrip(start_tag)
+            key = key.rstrip(end_tag)
+            if not rates_list[i]:  # ignoring empty lines
+                i += 1
+
+            sections_dict[key] = rates_list[i]
+            i += 1
+
+        return sections_dict
+
 
 class WillsonsRatesParser(Parser):
     """Willsons Parking extension of HTML parser class"""
@@ -80,8 +118,8 @@ class WillsonsRatesParser(Parser):
     def __init__(self):
         """Initialize Willsons Parking HTML parser."""
         Parser.__init__(self)
-        self.__ratesHTML = ""
         self.__sectionNames = ["Casual", "Early Bird", "Night", "Weekend"]
+        self.__sectionHtmlTag = "<h3>"
 
     def get_prices_information(self, html):
         """Process html code to build and return a parking rates object
@@ -94,17 +132,22 @@ class WillsonsRatesParser(Parser):
         """
         raw_rates = {}
         willsons_rates = WillsonsRates()
-        self.__ratesHTML = self.get_data_by_class_name("section", "rates", html)
+        rates_html = self.get_data_by_class_name("section", "rates", html).strip()
+        sections_dict = self.split_rates_by_sections(self.__sectionHtmlTag, rates_html)
 
         # Creating formatted array of parking prices
-        for section in self.__sectionNames:
-            raw_rates[section] = self._get_rates_for_section(section)
+        for section_name in sections_dict.keys():
+            if section_name not in self.__sectionNames:
+                # TODO: Write into log
+                print("Unknown section name: " + section_name)
+            else:
+                raw_rates[section_name] = sections_dict[section_name].splitlines()
 
         willsons_rates.feed(raw_rates)
 
         return willsons_rates
 
-    def _get_rates_for_section(self, current_section):
+    def _get_raw_rates_for_section(self, section_name, section_html):
         """Extracts data HTML for a specified section (e.g. Casual) and returns this data as a list
 
         Args:
@@ -113,9 +156,8 @@ class WillsonsRatesParser(Parser):
         Returns:
                 Filters HTML data relevant to the provided section and returns it at a list
         """
-        section_started = False
         result = ""
-        rates_html_iterator = iter(self.__ratesHTML.splitlines())
+        rates_html_iterator = iter(section_html.splitlines())
         for line in rates_html_iterator:
             current_section_header = "<h3>" + current_section + "</h3>"
             if current_section_header in line:
