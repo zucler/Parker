@@ -1,8 +1,13 @@
 from django.db import models
 
-RATE_TYPES = (
+PARKING_TYPES = (
     ('WILSON', 'Wilson'),
     ('SECURE', 'Secure Parking'),
+)
+
+RATE_TYPES = (
+    ('Hourly', 'Hourly'),
+    ('Flat', 'Flat'),
 )
 
 
@@ -12,6 +17,7 @@ class Parking(models.Model):
     address = models.TextField()
     lat = models.DecimalField(max_digits=10, decimal_places=6, default=0)
     long = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    parking_type = models.CharField(max_length=150, choices=PARKING_TYPES)
     places_of_interest = models.TextField()     # TODO: Need to be a separate table
     uri = models.TextField()
 
@@ -28,7 +34,7 @@ class RateType(models.Model):
     day_of_week = models.SmallIntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    type = models.CharField(max_length=50, choices=RATE_TYPES)
+    rate_type = models.CharField(max_length=50, choices=RATE_TYPES)
     label = models.CharField(max_length=50, default="")
 
     def __str__(self):
@@ -40,18 +46,18 @@ class RateType(models.Model):
         return obj_label
 
     class Meta:
-        unique_together = ('parkingID', 'day_of_week', 'start_time', 'end_time', 'type')
+        unique_together = ('parkingID', 'day_of_week', 'rate_type', 'label')
 
 
 class RatePrice(models.Model):
     rateID = models.ForeignKey(RateType, on_delete=models.CASCADE, db_column='rateID')
     duration = models.IntegerField()
-    price = models.CharField(max_length=50)     #TODO: Make decimal here
+    price = models.DecimalField(max_digits=10, decimal_places=6, default=0)
 
     def __str__(self):
         obj_label = self.rateID.__str__()
 
-        if self.rateID.type == "Hourly":        # TODO: Possibly deprecated
+        if self.rateID.type == "Hourly":
             obj_label += " [" + str(self.duration) + "]"
 
         return obj_label
