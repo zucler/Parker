@@ -11,7 +11,6 @@ def geo_search(self, min_lat, max_lat, min_long, max_long):
     Returns: All Parking's model objects within given boundary
     """
 
-    # TODO: lng__gte -> long_gte
-    parkings = Parking.object.filter(lat__gte=min_lat, lat__lte=max_lat, lng__gte=min_long, lng__lte=max_long)
+    parkings = Parking.object.filter(lat__gte=min_lat, lat__lte=max_lat, long__gte=min_long, long__lte=max_long)
 
     return parkings.all()
