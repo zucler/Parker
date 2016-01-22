@@ -14,9 +14,9 @@ class CustomReadOnlyRouter(SimpleRouter):
         ),
         Route(
             url=r'^{prefix}/get/{lookup}$',
-           mapping={'get': 'retrieve'},
-           name='{basename}-detail',
-           initkwargs={'suffix': 'Detail'}
+            mapping={'get': 'retrieve'},
+            name='{basename}-detail',
+            initkwargs={'suffix': 'Detail'}
         ),
         DynamicDetailRoute(
             url=r'^{prefix}/{methodnamehyphen}$',
