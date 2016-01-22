@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from .models import Parking, RateType, RatePrice
 from .constants import GOOGLE_MAPS_API_KEY
 
-import django.http
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 
@@ -30,20 +29,6 @@ class JSONResponse(HttpResponse):
 
 def index(request):
     return HttpResponse("Hello, world. We are at the carparker index")
-
-
-def test(request):
-    template_name = "parker/test_search.html"
-
-
-class DetailView(generic.DetailView):
-    model = Parking
-    template_name = 'parker/details.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
-        context['rates'] = RateType.objects.filter(parkingID=self.object.parkingID)
-        return context
 
 
 def search_index(request):
@@ -68,4 +53,4 @@ class ParkingViewSet(viewsets.ModelViewSet):
         queryset = geo_search(minlat, maxlat, minlong, maxlong)
 
         serializer = ParkingSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return JSONResponse(serializer.data)
