@@ -3,11 +3,13 @@ var map;
 var boundsEventTimer;
 boundsTimerDelay = 250;
 
+var markersArray = new Array();
+
 
 function initMap() {
   map = new google.maps.Map( document.getElementById('map') , {
-    center: {lat: -34.397, lng: 150.644},
-    zoom: 8
+    center: {lat: -33.870384731980205, lng: 151.200569099426275},
+    zoom: 14
   });
 	
 	function onBoundsChanged(){
@@ -28,7 +30,7 @@ function initMap() {
 		maxLong = Math.max(wLong, eLong);
 
 		//alert("Current bounds:\nMin Lat" + minLat + ", Max Lat: " + maxLat + "\nMin Long: " + minLong + ", MaxLong: " + maxLong);
-		find_parkings_by_latlong(minLat, maxLat, minLong, maxLong);
+		findParkingsByLatlong(minLat, maxLat, minLong, maxLong);
 	}
 	
 	map.addListener('bounds_changed', function() {
@@ -40,7 +42,7 @@ function initMap() {
 
 }
 
-function find_parkings_by_latlong(minlat, maxlat, minlong, maxlong) {
+function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 	$.ajax({
 		method: "GET",
 		url: "/api/parkings",
@@ -50,7 +52,8 @@ function find_parkings_by_latlong(minlat, maxlat, minlong, maxlong) {
 						"maxlong": maxlong },
 		success: function(data) {
 			if (data.length > 0) {
-				alert(data[0].label);
+				//alert(data[0]['lat'] + ",,, " + data[0]['long']);
+				processParkingData(data);
 			} else { 
 				alert("No parkings found"); }
 		},			
@@ -58,6 +61,24 @@ function find_parkings_by_latlong(minlat, maxlat, minlong, maxlong) {
 			alert("Error happened: " + textStatus + ", " + errorThrown);
 		}
 	});
+}
+
+function processParkingData(data) {	
+	// Add markers to the map
+	for (i = 0, len = data.length; i < len; i++) { 
+			latlong = 
+				new google.maps.LatLng({
+					lat: Number(data[i]['lat']), 
+					lng: Number(data[i]['long'])
+				}); 
+			
+			markersArray[i] = 
+				new google.maps.Marker({
+					position: latlong,
+					map: map,
+					title: data[i].label
+				});
+	}
 }
 	
 function globalInit() {
