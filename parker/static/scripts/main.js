@@ -1,7 +1,8 @@
 var map;
 
 var boundsEventTimer;
-boundsTimerDelay = 150;
+boundsTimerDelay = 250;
+
 
 function initMap() {
   map = new google.maps.Map( document.getElementById('map') , {
@@ -26,7 +27,8 @@ function initMap() {
 		minLong = Math.min(wLong, eLong);
 		maxLong = Math.max(wLong, eLong);
 
-		alert("Current bounds:\nMin Lat" + minLat + ", Max Lat: " + maxLat + "\nMin Long: " + minLong + ", MaxLong: " + maxLong);
+		//alert("Current bounds:\nMin Lat" + minLat + ", Max Lat: " + maxLat + "\nMin Long: " + minLong + ", MaxLong: " + maxLong);
+		find_parkings_by_latlong(minLat, maxLat, minLong, maxLong);
 	}
 	
 	map.addListener('bounds_changed', function() {
@@ -38,6 +40,26 @@ function initMap() {
 
 }
 
+function find_parkings_by_latlong(minlat, maxlat, minlong, maxlong) {
+	$.ajax({
+		method: "GET",
+		url: "/api/parkings",
+		data: { "minlat": minlat, 
+						"maxlat": maxlat, 
+						"minlong": minlong, 
+						"maxlong": maxlong },
+		success: function(data) {
+			if (data.length > 0) {
+				alert(data[0].label);
+			} else { 
+				alert("No parkings found"); }
+		},			
+		error: function(textStatus, errorThrown) {
+			alert("Error happened: " + textStatus + ", " + errorThrown);
+		}
+	});
+}
+	
 function globalInit() {
 	initMap();
 }
