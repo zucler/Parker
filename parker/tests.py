@@ -6,8 +6,8 @@ from django.test import TestCase
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
-from parker.parser import WillsonsRatesParser
-from parker.classes.parsers.rates import WillsonsRates
+from parker.classes.parsers.core.parser import WillsonsRatesParser
+from parker.classes.rates import WillsonsRates
 
 
 class WilssonsRateParserMethodTest(TestCase):

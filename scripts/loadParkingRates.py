@@ -1,23 +1,22 @@
-__author__ = 'Maxim Pak'
-
 import os
 import sys
-import pprint
 from contextlib import closing
 
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
+import parker.wsgi
+from parker.classes.utils import Utils
+from parker.models import Parking, RateType, RatePrice
+
 sys.path.append('/srv/prod/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
-import parker.wsgi
-from parker.models import Parking, RateType, RatePrice
-from parker.parser import WillsonsRatesParser
-from parker.classes.utils import Utils
 
-carparkings = Parking.objects.all()
-#carparkings = Parking.objects.filter(parkingID=1)
+# carparkings = Parking.objects.all()
+carparkings = Parking.objects.filter(parkingID=2)
 for carpark in carparkings:
+    mod = __import__("parker.classes.parsers." + carpark.parking_type.lower() + ".parser", fromlist=['RatesParser'])
+    RatesParser = getattr(mod, 'RatesParser')
     url = carpark.uri
     # use firefox to get page with javascript generated content
     with closing(Firefox()) as browser:
@@ -26,10 +25,10 @@ for carpark in carparkings:
         WebDriverWait(browser, timeout=10).until(
                 lambda x: x.find_element_by_class_name('rates'))
         # store it as string variable
-        parser = WillsonsRatesParser()
+        parser = RatesParser()
         rates = parser.get_prices_information(browser.page_source)
-        # Utils.pprint(rates.types)
-        # exit()
+        Utils.pprint(rates.rates)
+        exit()
         # save rates into DB
         for rate_name, rate_data in rates.types.items():
             if rate_data['type'] == "Flat":
@@ -53,6 +52,7 @@ for carpark in carparkings:
                     carpark_rate_price, created = RatePrice.objects.get_or_create(rateID=carpark_rate, duration=0)
                     if carpark_rate_price != rates.rates[rate_name][day_of_week]:
                         carpark_rate_price.price = rates.rates[rate_name][day_of_week]
+                        print(carpark_rate_price.price + " = " + rates.rates[rate_name][day_of_week])
                         carpark_rate_price.save()
             elif rate_data['type'] == "Hourly":
                 carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_name,
