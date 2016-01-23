@@ -1,44 +1,13 @@
-__author__ = 'Maxim Pak'
-
-import collections
 import re
 
+from parker.classes.rates.core.rates import CoreRates
 from parker.classes.utils import Utils
 
 
-class Rates:
-    """Generic parking rates class
-    This class is a generic storage of parking rates for any car park.
-
-    Attributes:
-            types (array): Key => Value like mapping of each prices section name and its' type (e.g. hourly/flat rates)
-            rates (array): Array of rates sections
-            daysOfWeek (list): List of all days in the week
-    """
-
-    def __init__(self):
-        """Initialize a generic rates object."""
-
-        self.types = {}
-        self.rates = {}
-        self.daysOfWeek = ['Mon', "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-    def is_a_day(self, string):
-        """Detect if string is a day of week
-
-        Args:
-                string (str): string to compare
-        """
-        for day in self.daysOfWeek:
-            if Utils.string_found(day, string):
-                return True
-        return False
-
-
-class WillsonsRates(Rates):
+class Rates(CoreRates):
     def __init__(self):
         """Initialize Willsons Parking rates object."""
-        Rates.__init__(self)
+        CoreRates.__init__(self)
 
     def feed(self, raw_rates):
         """Feed data into object and process it
@@ -152,11 +121,16 @@ class WillsonsRates(Rates):
         Returns:
                 Returns formatted prices for every half-hour (for hourly rates) or each day (if flat rate)
         """
-        prices = collections.OrderedDict()
+        prices = {}
         current_hourly_minutes = 0
-
+        if section_name == "Early Bird":
+            Utils.pprint(rates)
+            exit()
         for i in range(0, len(rates)):
             line = rates[i]
+
+            if not line:
+                continue;
 
             # Skips last element in the list
             if not i + 1 == len(rates):
@@ -184,12 +158,15 @@ class WillsonsRates(Rates):
                         prices[1440] = prices_str  # 1440 is 24 hours in minutes
 
             # Process flat price section
-            if self.types[section_name]['type'] == "Flat":
-                if self.is_a_day(line):
-                    days_range = self._detect_days_in_range(line)
-                    flat_price = self._format_prices_line(next_line)
-                    for day in days_range:
-                        prices[day] = flat_price
+#            if self.types[section_name]['type'] == "Flat":
+#                if section_name == "Early Bird": # Early bird can be dodgy as it has
+
+                # else:
+                #     if self.is_a_day(line):
+                #         days_range = self._detect_days_in_range(line)
+                #         flat_price = self._format_prices_line(next_line)
+                #         for day in days_range:
+                #             prices[day] = flat_price
 
         return prices
 
