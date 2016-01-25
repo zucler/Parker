@@ -3,10 +3,7 @@
 {% load staticfiles %}
 
 {% block meta %}
-    <style type="text/css">
-      html, body { height: 100%; margin: 0; padding: 0; }
-      #map { height: 100%; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/main.css' %}">
 {% endblock meta %}
 
 
@@ -16,7 +13,7 @@
 
 
 {% block body_script %}
-    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3&key={{google_maps_api_key}}&callback=initMap"></script>
-    <script async src="{% static "scripts/jquery-1.12.0.min.js" %}"></script>
-    <script defer src="{% static "scripts/main.js" %}"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3&key={{google_maps_api_key}}&callback=initMap&libraries=places"></script>
+    <script async src="{% static 'scripts/jquery-1.12.0.min.js' %}"></script>
+    <script defer src="{% static 'scripts/main.js' %}"></script>
 {% endblock body_script %}
