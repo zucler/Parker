@@ -3,8 +3,14 @@ var map;
 var boundsEventTimer;
 boundsTimerDelay = 250;
 
-var markersArray = new Array();
+var markersParking = new Array();
+var markersPlaces = new Array();
 
+var debugField = document.getElementById('debug');
+
+function debug(content) {
+	debugField.innerHTML = content;
+}
 
 function initMap() {
   map = new google.maps.Map( document.getElementById('map') , {
@@ -33,8 +39,9 @@ function initMap() {
 		// Will be a problem in case of 180 meridian crossing
 		minLong = Math.min(wLong, eLong);
 		maxLong = Math.max(wLong, eLong);
+		
+		debug("minLat: " + minLat + ", minLong: " + minLong + "<br>maxLat: " + maxLat + ", maxLong: " + maxLong);
 
-		//alert("Current bounds:\nMin Lat" + minLat + ", Max Lat: " + maxLat + "\nMin Long: " + minLong + ", MaxLong: " + maxLong);
 		findParkingsByLatlong(minLat, maxLat, minLong, maxLong);
 	}
 	
@@ -43,6 +50,10 @@ function initMap() {
 		// For example, when you drag the map or zooming in/out.
 		clearTimeout(boundsEventTimer); 
     boundsEventTimer = setTimeout(onBoundsChanged, boundsTimerDelay)
+		
+		// TODO: No need to look for parking places in case if new bounds cover less area than before
+		// 			 ex. If user zooming in
+		
   });
 	
 	// Create search box
@@ -64,7 +75,7 @@ function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 			if (data.length > 0) {
 				processParkingData(data);
 			} else { 
-				alert("No parkings found"); }
+				debug("No parkings found"); }
 		},			
 		error: function(textStatus, errorThrown) {
 			alert("Error happened: " + textStatus + ", " + errorThrown);
@@ -73,7 +84,7 @@ function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 }
 
 function processParkingData(data) {	
-	// Add markers to the map
+	// Add markersPlaces to the map
 	for (i = 0, len = data.length; i < len; i++) { 
 			latlong = 
 				new google.maps.LatLng({
@@ -81,7 +92,7 @@ function processParkingData(data) {
 					lng: Number(data[i]['long'])
 				}); 
 			
-			markersArray[i] = 
+			markersParking[i] = 
 				new google.maps.Marker({
 					position: latlong,
 					map: map,
@@ -92,31 +103,31 @@ function processParkingData(data) {
 	
 function createSearchControl(parentDiv) {
 	parentDiv.id = "search-box"
-	// Set CSS for the control border
-	var controlUI = document.createElement('div');
-	controlUI.style.backgroundColor = '#fff';
-	controlUI.style.border = '2px solid #fff';
-	controlUI.style.cursor = 'pointer';
-	controlUI.style.marginBottom = '22px';
-	controlUI.style.textAlign = 'center';
-	//controlUI.title = 'Click to recenter the map';
-	parentDiv.appendChild(controlUI);
 
-	// Set CSS for the control interior
-	var controlText = document.createElement('input');
-	controlText.style.color = 'rgb(25,25,25)';
-	controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-	controlText.style.fontSize = '16px';
-	controlText.style.lineHeight = '38px';
-	controlText.style.paddingLeft = '5px';
-	controlText.style.paddingRight = '5px';
-	controlText.innerHTML = 'Center Map';
-	controlUI.appendChild(controlText);
+	var controlUI = document.createElement('div');
+	parentDiv.appendChild(controlUI);
 	
-	attachSearchControl(controlText);
+	var input = document.createElement('input');
+	input.type = 'text';
+	controlUI.appendChild(input);
+	
+	attachSearchControl(input);
+	
+	var executeInput = function(e) { 
+		google.maps.event.trigger( input, 'focus')
+		google.maps.event.trigger( input, 'keydown', {keyCode:13})
+	}
+	
+	var button = document.createElement('input');
+	button.type = 'button';
+	button.value = 'Go search!';
+	button.onclick = executeInput;
+	button.onkeydown = executeInput;
+	controlUI.appendChild(button);
+	
+	
 }
 
-var markers = new Array();
 
 function attachSearchControl (parentDiv) {
 	var AustraliaBounds = new google.maps.LatLngBounds(
@@ -127,7 +138,7 @@ function attachSearchControl (parentDiv) {
 		bounds: AustraliaBounds
 	});
 	
-	  // Listen for the event fired when the user selects a prediction and retrieve
+	// Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
   searchBox.addListener('places_changed', function() {
     var places = searchBox.getPlaces();
@@ -136,36 +147,53 @@ function attachSearchControl (parentDiv) {
       return;
     }
 
-    // Clear out the old markers.
-    markers.forEach(function(marker) {
+    // Clear out the old markersPlaces.
+    markersPlaces.forEach(function(marker) {
       marker.setMap(null);
     });
-    markers = [];
+    markersPlaces = [];
 
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
-    places.forEach(function(place) {
+    places.forEach(function(placeItem) {
       var icon = {
-        url: place.icon,
+        url: placeItem.icon,
         size: new google.maps.Size(71, 71),
         origin: new google.maps.Point(0, 0),
         anchor: new google.maps.Point(17, 34),
         scaledSize: new google.maps.Size(25, 25)
       };
+	
+			var infowindow = new google.maps.InfoWindow({
+				content: placeItem.html_attributions[0]
+			});
 
-      // Create a marker for each place.
-      markers.push(new google.maps.Marker({
+			var marker = new google.maps.Marker({
         map: map,
         icon: icon,
-        title: place.name,
-        position: place.geometry.location
-      }));
+        title: placeItem.name,
+				clickable: true,
+				// label: '1', // Shows only if icon is not defined
+        position: placeItem.geometry.location,
+				place: {
+									location: placeItem.geometry.location,
+									placeId: placeItem.place_id
+								}
+      });
+			
+			marker.addListener('click', function() {
+				infowindow.open(map, marker);
+			});
+		
+			
+      // Create a marker for each place.
+      markersPlaces.push(marker);
 
-      if (place.geometry.viewport) {
+      if (placeItem.geometry.viewport) {
         // Only geocodes have viewport.
-        bounds.union(place.geometry.viewport);
+        bounds.union(placeItem.geometry.viewport);
       } else {
-        bounds.extend(place.geometry.location);
+        bounds.extend(placeItem.geometry.location);
       }
     });
     map.fitBounds(bounds);
