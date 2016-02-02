@@ -36,7 +36,7 @@ function initMap() {
 		minLat = Math.min(sLat, nLat);
 		maxLat = Math.max(sLat, nLat);
 		
-		// Will be a problem in case of 180 meridian crossing
+		// FIXME: Will be a problem in case of 180 meridian crossing
 		minLong = Math.min(wLong, eLong);
 		maxLong = Math.max(wLong, eLong);
 		
@@ -104,11 +104,22 @@ function processParkingData(data) {
 function createSearchControl(parentDiv) {
 	parentDiv.id = "search-box"
 
+	/* 
+		<div class="input-group input-group-lg">
+      <input type="text" class="form-control input-lg" placeholder="Search for...">
+      <span class="input-group-btn">
+        <button class="btn btn-primary btn-lg" type="button">Search</button>
+      </span>
+    </div>
+	*/
 	var controlUI = document.createElement('div');
+	controlUI.className += " input-group input-group-lg";
 	parentDiv.appendChild(controlUI);
 	
 	var input = document.createElement('input');
 	input.type = 'text';
+	input.className += "form-control";
+	input.placeholder = "Search for a place";
 	controlUI.appendChild(input);
 	
 	attachSearchControl(input);
@@ -118,14 +129,19 @@ function createSearchControl(parentDiv) {
 		google.maps.event.trigger( input, 'keydown', {keyCode:13})
 	}
 	
-	var button = document.createElement('input');
-	button.type = 'button';
-	button.value = 'Go search!';
+	var span = document.createElement('span');
+	span.className += " input-group-btn";
+	
+	var button = document.createElement('button');
+	button.className += " btn btn-primary";
+	button.type = "button";
+	//button.textContent = 'Go search!';
+	button.innerHTML = '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>';
 	button.onclick = executeInput;
 	button.onkeydown = executeInput;
-	controlUI.appendChild(button);
 	
-	
+	span.appendChild(button);
+	controlUI.appendChild(span);
 }
 
 
