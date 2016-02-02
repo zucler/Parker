@@ -34,7 +34,7 @@ class RateType(models.Model):
     day_of_week = models.SmallIntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    rate_type = models.CharField(max_length=50, choices=RATE_TYPES)
+    rate_type = models.CharField(max_length=50, choices=RATE_TYPES, default="Flat")
     label = models.CharField(max_length=50, default="")
 
     def __str__(self):

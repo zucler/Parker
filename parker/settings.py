@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'polls',
     'parker',
     'rest_framework',
+    'static_precompiler',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -86,6 +87,13 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = '/extras/'
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'static_precompiler.finders.StaticPrecompilerFinder',
+)
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -111,3 +119,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+STATIC_PRECOMPILER_OUTPUT_DIR = "compiled"
+STATIC_PRECOMPILER_COMPILERS = (
+    ('static_precompiler.compilers.SCSS', {
+        "executable": "/usr/local/bin/sass",
+        "sourcemap_enabled": True,
+        "compass_enabled": True,
+        "load_paths": ["/path"]
+    }),
+ )
