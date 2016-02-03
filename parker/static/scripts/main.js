@@ -4,13 +4,18 @@ var boundsEventTimer;
 boundsTimerDelay = 250;
 
 var markersParking = new Array();
-var markersPlaces = new Array();
+var windowsParking = new Array();
+
+var markersFoundPlaces = new Array();
+var windowsFoundPlaces = new Array();
 
 var debugField = document.getElementById('debug');
+
 
 function debug(content) {
 	debugField.innerHTML = content;
 }
+
 
 function initMap() {
   map = new google.maps.Map( document.getElementById('map') , {
@@ -46,14 +51,13 @@ function initMap() {
 	}
 	
 	map.addListener('bounds_changed', function() {
-		// Here is a timer used to eliminate execution of event fired too close to each other
+		// Here is a timer used to eliminate execution of event fired too often
 		// For example, when you drag the map or zooming in/out.
 		clearTimeout(boundsEventTimer); 
     boundsEventTimer = setTimeout(onBoundsChanged, boundsTimerDelay)
 		
 		// TODO: No need to look for parking places in case if new bounds cover less area than before
 		// 			 ex. If user zooming in
-		
   });
 	
 	// Create search box
@@ -62,6 +66,7 @@ function initMap() {
 	controlDiv.index = 1;
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
 }
+
 
 function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 	$.ajax({
@@ -79,54 +84,79 @@ function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 		},			
 		error: function(textStatus, errorThrown) {
 			alert("Error happened: " + textStatus + ", " + errorThrown);
+			// FIXME: Should start ajax command again
 		}
 	});
 }
 
+
 function processParkingData(data) {	
-	// Add markersPlaces to the map
-	for (i = 0, len = data.length; i < len; i++) { 
-			latlong = 
+	derefMarkers(markersParking);
+	derefWindows(windowsParking);
+	
+	// FIXME: When moving or zooming, markers and windows will disappear.
+	// Need to make workaround to not delete opened window.
+	// And to not delete and not add markers already added to map.
+	// For that need to use parking unique ID array
+	
+	data.forEach(function(dataItem) {
+		latlong = 
 				new google.maps.LatLng({
-					lat: Number(data[i]['lat']), 
-					lng: Number(data[i]['long'])
+					lat: Number(dataItem['lat']), 
+					lng: Number(dataItem['long'])
 				}); 
 			
-			markersParking[i] = 
-				new google.maps.Marker({
-					position: latlong,
-					map: map,
-					title: data[i].label
-				});
-	}
+		var marker = 
+			new google.maps.Marker({
+				position: latlong,
+				map: map,
+				clickable: true,
+				title: dataItem.label,
+			});
+			
+		var infowindow = new google.maps.InfoWindow({
+			content: dataItem.label + "<br>Address: " + dataItem.address,
+			//TODO: More info
+		});
+		
+		marker.addListener('click', function() {
+				windowsParking.forEach(function(window){ window.close(); })
+				infowindow.open(map, marker); // FIXME: Window position has erroneous offset
+			});
+			
+		markersParking.push(marker);
+		windowsParking.push(infowindow);
+	});
+		
 }
+	
 	
 function createSearchControl(parentDiv) {
 	parentDiv.id = "search-box"
 
-	/* 
-		<div class="input-group input-group-lg">
+	/*<div class="input-group input-group-lg">
       <input type="text" class="form-control input-lg" placeholder="Search for...">
       <span class="input-group-btn">
         <button class="btn btn-primary btn-lg" type="button">Search</button>
       </span>
-    </div>
-	*/
+    </div>*/
+		
 	var controlUI = document.createElement('div');
 	controlUI.className += " input-group input-group-lg";
 	parentDiv.appendChild(controlUI);
 	
-	var input = document.createElement('input');
-	input.type = 'text';
-	input.className += "form-control";
-	input.placeholder = "Search for a place";
-	controlUI.appendChild(input);
+	var searchInput = document.createElement('input');
+	searchInput.className += "form-control";
+	searchInput.type = 'text';
+	searchInput.placeholder = "Search for a place";
+	controlUI.appendChild(searchInput);
 	
-	attachSearchControl(input);
+	attachSearchControl(searchInput);
 	
 	var executeInput = function(e) { 
-		google.maps.event.trigger( input, 'focus')
-		google.maps.event.trigger( input, 'keydown', {keyCode:13})
+		// SearchBox need that sequence to start searching
+		google.maps.event.trigger( searchInput, 'focus')
+		google.maps.event.trigger( searchInput, 'keydown', {keyCode:13})
 	}
 	
 	var span = document.createElement('span');
@@ -135,13 +165,27 @@ function createSearchControl(parentDiv) {
 	var button = document.createElement('button');
 	button.className += " btn btn-primary";
 	button.type = "button";
-	//button.textContent = 'Go search!';
 	button.innerHTML = '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>';
 	button.onclick = executeInput;
 	button.onkeydown = executeInput;
 	
 	span.appendChild(button);
 	controlUI.appendChild(span);
+}
+
+
+function derefMarkers(markerArray) { 
+	markerArray.forEach(function(marker) {
+      marker.setMap(null);
+    });
+  markerArray = [];
+}
+
+function derefWindows(windowsArray) {
+	windowsArray.forEach(function(window) {
+      window.close();
+    });
+	windowsArray = [];
 }
 
 
@@ -163,11 +207,8 @@ function attachSearchControl (parentDiv) {
       return;
     }
 
-    // Clear out the old markersPlaces.
-    markersPlaces.forEach(function(marker) {
-      marker.setMap(null);
-    });
-    markersPlaces = [];
+		derefMarkers(markersFoundPlaces);
+		derefWindows(windowsFoundPlaces);
 
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
@@ -176,12 +217,13 @@ function attachSearchControl (parentDiv) {
         url: placeItem.icon,
         size: new google.maps.Size(71, 71),
         origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(17, 34),
+        anchor: new google.maps.Point(35, 35),
         scaledSize: new google.maps.Size(25, 25)
       };
 	
 			var infowindow = new google.maps.InfoWindow({
-				content: placeItem.html_attributions[0]
+				content: placeItem.name + "<br>Website: " + placeItem.website, 
+				// TODO: Need to show more info (https://developers.google.com/maps/documentation/javascript/places#place_details_results)
 			});
 
 			var marker = new google.maps.Marker({
@@ -189,7 +231,6 @@ function attachSearchControl (parentDiv) {
         icon: icon,
         title: placeItem.name,
 				clickable: true,
-				// label: '1', // Shows only if icon is not defined
         position: placeItem.geometry.location,
 				place: {
 									location: placeItem.geometry.location,
@@ -198,12 +239,17 @@ function attachSearchControl (parentDiv) {
       });
 			
 			marker.addListener('click', function() {
-				infowindow.open(map, marker);
+				windowsFoundPlaces.forEach(function(window){ 
+					window.close();
+				})
+				
+				infowindow.open(map, marker); // FIXME: Window position has erroneous offset
 			});
 		
 			
       // Create a marker for each place.
-      markersPlaces.push(marker);
+      markersFoundPlaces.push(marker);
+			windowsFoundPlaces.push(infowindow);
 
       if (placeItem.geometry.viewport) {
         // Only geocodes have viewport.
@@ -215,6 +261,7 @@ function attachSearchControl (parentDiv) {
     map.fitBounds(bounds);
   });
 }
+	
 	
 function globalInit() {
 	initMap();
