@@ -1,15 +1,27 @@
-from django.db.models import Model
 from parker.models import Parking, RatePrice, RateType
 
 
-def geo_search(min_lat, max_lat, min_long, max_long):
+def geo_search_all_models(min_lat, max_lat, min_long, max_long):
     """
-    We assume that search boundaries are small enough so there is no need to do complex
-    spherical calculations of latitude and longitude.
-
     Returns: All Parking's model objects within given boundary
     """
 
-    parkings = Parking.objects.filter(lat__gte=min_lat, lat__lte=max_lat, long__gte=min_long, long__lte=max_long)
+    # INFO: All the arguments validation happens in child functions
 
-    return parkings.all()
+    parkings = Parking.objects.filter(lat__gte=min_lat, lat__lte=max_lat, long__gte=min_long, long__lte=max_long).all()
+    rtype = RateType.objects.filter(parkingID__in=parkings).all()
+    rprice = RatePrice.objects.filter(rateID__in=rtype).all()
+
+    # To cache whole querysets
+    # FIXME: We need workaround where no extra work done
+    bool(parkings)
+    bool(rtype)
+    bool(rprice)
+
+    everything = {
+        'parkings': parkings,
+        'ratetype': rtype,
+        'rateprice': rprice,
+    }
+
+    return everything
