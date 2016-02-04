@@ -15,7 +15,7 @@ from .constants import GOOGLE_MAPS_API_KEY
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 
-from .dbhelpers import geo_search
+from .dbhelpers import geo_search_all_models
 from parker.serializers import ParkingSerializer
 
 
@@ -50,7 +50,28 @@ class ParkingViewSet(viewsets.ModelViewSet):
         minlong = getdict.get("minlong", None)
         maxlong = getdict.get("maxlong", None)
 
-        queryset = geo_search(minlat, maxlat, minlong, maxlong)
+        try:
+            geosearch = geo_search_all_models(minlat, maxlat, minlong, maxlong)
+        except ValueError:
+            raise
 
-        serializer = ParkingSerializer(queryset, many=True)
+        # First we need to take Parking item.
+        # Then when we know parkingID we should find all RateType with that ID.
+        # Then we need to find all RatePrices with each found RateType.
+        # So it is O(n^2) complexity
+
+        # I'll try to use dict comprehensions:
+        # x = { row.SITE_NAME : row.LOOKUP_TABLE for row in cursor }
+
+        parkings = list(geosearch['parkings'])     # Here we have list of dicts
+        rtype = geosearch['ratetype']
+        rprice = geosearch['rateprice']
+
+        for p_item in parkings:
+            sub_ratetype = rtype.filter(parkingID=p_item.parkingID)
+            for rt_item in sub_ratetype:
+                rt_item.rateprice = list(rprice.filter(rateID=rt_item.rateID))
+            p_item.ratetype = sub_ratetype
+
+        serializer = ParkingSerializer(parkings, many=True)
         return JSONResponse(serializer.data)
