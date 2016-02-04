@@ -121,7 +121,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-STATIC_PRECOMPILER_OUTPUT_DIR = os.path.join(BASE_DIR, "compiled/")
+STATIC_PRECOMPILER_OUTPUT_DIR = "compiled"
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.SCSS', {
         #"executable": "/home/ctepa/bin/sass",
