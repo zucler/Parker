@@ -38,7 +38,7 @@ class RateType(models.Model):
     label = models.CharField(max_length=50, default="")
 
     def __str__(self):
-        obj_label = self.parkingID.label + " - " + self.type + " - " + self.label
+        obj_label = self.parkingID.label + " - " + self.rate_type + " - " + self.label
 
         if self.day_of_week:
             obj_label += " - " + str(self.day_of_week)
@@ -57,10 +57,19 @@ class RatePrice(models.Model):
     def __str__(self):
         obj_label = self.rateID.__str__()
 
-        if self.rateID.type == "Hourly":
+        if self.rateID.rate_type == "Hourly":
             obj_label += " [" + str(self.duration) + "]"
 
         return obj_label
 
     class Meta:
         unique_together = ('duration', 'rateID')
+
+
+class EverythingModel(models.Model):
+    pp = Parking
+    rt = RateType
+    rp = RatePrice
+
+    class Meta:
+        abstract=True
