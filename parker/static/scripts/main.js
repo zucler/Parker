@@ -6,6 +6,8 @@ boundsTimerDelay = 250;
 var markersParking = new Array();
 var windowsParking = new Array();
 
+// TODO: Use only one InfoWindow for all markers and fill it with content when opening.
+
 var markersFoundPlaces = new Array();
 var windowsFoundPlaces = new Array();
 
@@ -100,7 +102,7 @@ function processParkingData(data) {
 	// For that need to use parking unique ID array
 	
 	data.forEach(function(dataItem) {
-		latlong = 
+		var latlong = 
 				new google.maps.LatLng({
 					lat: Number(dataItem['lat']), 
 					lng: Number(dataItem['long'])
@@ -114,8 +116,31 @@ function processParkingData(data) {
 				title: dataItem.label,
 			});
 			
+		var ratetype = dataItem['ratetype'][0];
+				
+		var ratetypeInfo = 
+			"DayOfWeek: " + ratetype['day_of_week'] + "<br>" +
+			"Start time: " + ratetype['start_time'] + "<br>" +
+			"End time: " + ratetype['end_time'] + "<br>" +
+			"Rate Type: " + ratetype['rate_type'] + "<br>" +
+			"Label: " + ratetype['label'] + "<br>";
+		
+		var priceTable = "";
+		
+		ratetype.rateprice.forEach(function(rpItem) {
+			priceTable += "<tr>" +
+				"<td>" + rpItem.rateID_id + "</td>" +
+				"<td>" + rpItem.duration + "</td>" +
+				"<td>" + rpItem.price + "</td>" +
+				"</tr>";
+		})
+		
+		priceTable = "<table><th>RateID</th><th>Duration</th><th>Price</th>" + priceTable + "</table>";
+		
+		ratetypeInfo += "<br>Prices:<br>" + priceTable;
+			
 		var infowindow = new google.maps.InfoWindow({
-			content: dataItem.label + "<br>Address: " + dataItem.address,
+			content: dataItem.label + "<br>Address: " + dataItem.address + "<br>" + ratetypeInfo,
 			//TODO: More info
 		});
 		
