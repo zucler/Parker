@@ -63,6 +63,7 @@ DATABASES = {
         'NAME': 'parker',  # Or path to database file if using sqlite3.
         'USER': 'remoteroot',  # Not used with sqlite3.
         'PASSWORD': 'carparker5ql',  # Not used with sqlite3.
+        #'HOST': 'localhost',
         'HOST': 'ec2-52-62-15-148.ap-southeast-2.compute.amazonaws.com',  # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
     }
@@ -123,6 +124,7 @@ REST_FRAMEWORK = {
 STATIC_PRECOMPILER_OUTPUT_DIR = "compiled"
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.SCSS', {
+        #"executable": "/opt/aws/bin/sass",
         "executable": "/usr/local/bin/sass",
         "sourcemap_enabled": True,
         "compass_enabled": True,
