@@ -84,9 +84,9 @@ class CoreParser(HTMLParser):
                     self.__pageContent[self.__sectionName] = self.__sectionContent
                     self.__sectionContent = []  # Resetting section content
                 self.__newSectionStarted = False
-                self.__sectionName = data
+                self.__sectionName = data.strip()
             else:
-                self.__sectionContent.append(data)
+                self.__sectionContent.append(data.strip())
 
     def handle_endtag(self, tag):
         """Reads closing tag of an HTML element.
