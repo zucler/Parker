@@ -1,13 +1,63 @@
 import re
 
-from parker.classes.rates.core.rates import CoreRates
-from parker.classes.utils import Utils
+from parker.classes.core.utils import Utils
 
 
-class Rates(CoreRates):
+class WilsonRates:
+
+    DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
     def __init__(self):
         """Initialize Willsons Parking rates object."""
-        CoreRates.__init__(self)
+        self.parking_type = "Wilson"
+
+    def is_a_day(self, string):
+        """Detect if string is a day of week
+
+        Args:
+                string (str): string to compare
+        """
+        for day in self.DAYS_OF_WEEK:
+            if Utils.string_found(day, string):
+                return True
+        return False
+
+    def _detect_days_in_range(self, days_range):
+        """Read a string and return a list of all days in it
+
+        Args:
+                days_range (str): Mon-Fri
+
+        Returns:
+                Returns list of all the days included in range
+        """
+        try:
+            self.__start_date, self.__end_date = days_range.split(" - ")
+        except Exception:
+            return [days_range]
+
+        self.__range_started = False
+        self.__list_of_days = []
+        result = False
+        max_iterations = 2
+        iteration = 1
+        while not result or iteration == max_iterations:
+            result = self._loop_through_days()
+            ++iteration
+
+        self.__list_of_days.sort()
+        return self.__list_of_days
+
+    def _loop_through_days(self):
+        for day in self.DAYS_OF_WEEK:
+            if self.__start_date == day:
+                self.__range_started = True
+
+            if self.__range_started:
+                self.__list_of_days.append(Utils.day_string_to_digit(day))
+
+            if self.__range_started and self.__end_date == day:
+                return True
 
     def feed(self, raw_rates):
         """Feed data into object and process it
@@ -31,6 +81,13 @@ class Rates(CoreRates):
         """
         rate_type = {}
 
+        module_name = rate_name.lower().replace (" ", "_")
+        class_name = rate_name.title() + "Rate"
+        mod = __import__("parker.classes.rates." + self.parking_type.lower() + ".rates_sections." + module_name, fromlist=[class_name])
+        RateType = getattr(mod, class_name)
+
+        details = RateType.get_rate_details(section_data)
+
         if section_name == "Early Bird":
             for string in rates:
                 if Utils.string_found("Entry between", string):
@@ -47,9 +104,7 @@ class Rates(CoreRates):
                     rate_type['start'] = Utils.convert_to_24h_format(rate_times[0])
                     rate_type['end'] = "23:59"
 
-        if section_name == "Casual":
-            rate_type['start'] = "00:00"
-            rate_type['end'] = "23:59"
+
 
         if section_name == "Weekend":
             rate_type['start'] = "00:00"
@@ -169,43 +224,6 @@ class Rates(CoreRates):
                 #             prices[day] = flat_price
 
         return prices
-
-    def _detect_days_in_range(self, days_range):
-        """Read a string and return a list of all days in it
-
-        Args:
-                days_range (str): Mon-Fri
-
-        Returns:
-                Returns list of all the days included in range
-        """
-        try:
-            self.__start_date, self.__end_date = days_range.split(" - ")
-        except Exception:
-            return [days_range]
-
-        self.__range_started = False
-        self.__list_of_days = []
-        result = False
-        max_iterations = 2
-        iteration = 1
-        while not result or iteration == max_iterations:
-            result = self._loop_through_days()
-            ++iteration
-
-        self.__list_of_days.sort()
-        return self.__list_of_days
-
-    def _loop_through_days(self):
-        for day in self.daysOfWeek:
-            if self.__start_date == day:
-                self.__range_started = True
-
-            if self.__range_started:
-                self.__list_of_days.append(Utils.day_string_to_digit(day))
-
-            if self.__range_started and self.__end_date == day:
-                return True
 
     def _format_hours_line(self, line):
         """Remove unnecessary bits from hours string
