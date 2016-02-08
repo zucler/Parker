@@ -23,8 +23,7 @@ class RatesSection(WilsonRates):
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
         self._process_days()
 
-        Utils.pprint(self.processed_rates)
-        exit()
+        return self.processed_rates
 
     def _process_days(self):
         for line in self.rates_data:
