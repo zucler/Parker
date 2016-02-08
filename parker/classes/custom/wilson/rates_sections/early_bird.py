@@ -11,6 +11,11 @@ class RatesSection(WilsonRates):
     ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?"
 
     def __init__(self):
+        """ Init Early Bird Rates Section
+
+        Returns:
+
+        """
         WilsonRates.__init__(self)
         self.rates_data = ""
         self.processed_rates = dict()
@@ -18,6 +23,14 @@ class RatesSection(WilsonRates):
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
     def get_details(self, raw_data):
+        """ Extracts early bird rates information from raw data provided
+
+        Args:
+            raw_data (list): List of Early bird lines
+
+        Returns:
+            Returns dictionary of Early Bird and Super Early Bird data
+        """
         self.rates_data = raw_data
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
@@ -65,6 +78,7 @@ class RatesSection(WilsonRates):
             # If current line is a header, and next one is price
             if self._do_save_rates(titles_list, dict_key, line, next_line):
                 self.processed_rates[dict_key]["price"] = next_line
+                self.processed_rates[dict_key]["rate_type"] = "flat"
             # Else if current line is Entry & Exit times
             elif self._do_save_times_data(titles_list, dict_key, line):
                 times_list = line.split(",")
