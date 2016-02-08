@@ -21,7 +21,8 @@ class RatesSection(WilsonRates):
         self.rates_data = raw_data
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
-        #self._process_days()
+        self._process_days()
+
         Utils.pprint(self.processed_rates)
         exit()
 
@@ -30,12 +31,21 @@ class RatesSection(WilsonRates):
             if self.is_a_day(line):  # Check if a line has days information
                 # Check if days are specific to a certain rate
                 if self._is_title_in_line(line, self.SUPER_EARLY_BIRD_HTML_TITLES):
+                    line = self._extract_day_string(self.SUPER_EARLY_BIRD_HTML_TITLES, line)
                     self.processed_rates[self.SUPER_EARLY_BIRD_KEY]['days'] = self._detect_days_in_range(line)
                 elif self._is_title_in_line(line, self.EARLY_BIRD_HTML_TITLES):
+                    line = self._extract_day_string(self.EARLY_BIRD_HTML_TITLES, line)
                     self.processed_rates[self.EARLY_BIRD_KEY]['days'] = self._detect_days_in_range(line)
                 else:
                     for rate_type in self.processed_rates.keys():
-                        self.processed_rates[rate_type]["days"] = self._detect_days_in_range(line)
+                        if "price" in self.processed_rates[rate_type].keys():
+                            self.processed_rates[rate_type]["days"] = self._detect_days_in_range(line)
+
+    def _extract_day_string(self, titles_list, line):
+        for title in titles_list:
+            if Utils.string_found(title, line.lower()):
+                line = line.lower().replace(title, "").strip()
+                return line
 
     def _process_rates(self, titles_list, dict_key):
         """ Parses raw rates data provided and builds a structured dictionary of information
