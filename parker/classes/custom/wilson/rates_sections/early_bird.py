@@ -8,7 +8,6 @@ class RatesSection(WilsonRates):
     SUPER_EARLY_BIRD_HTML_TITLES = ["super early bird", "super eb", "super earlybird"]
     EARLY_BIRD_KEY = "early bird"
     EARLY_BIRD_HTML_TITLES = ["early bird", "eb", "earlybird"]
-    ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?"
 
     def __init__(self):
         """ Init Early Bird Rates Section
@@ -32,6 +31,8 @@ class RatesSection(WilsonRates):
             Returns dictionary of Early Bird and Super Early Bird data
         """
         self.rates_data = raw_data
+        self.processed_rates['label'] = "Early Bird"
+
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
         self._process_days()
@@ -81,20 +82,12 @@ class RatesSection(WilsonRates):
                 self.processed_rates[dict_key]["rate_type"] = "flat"
             # Else if current line is Entry & Exit times
             elif self._do_save_times_data(titles_list, dict_key, line):
-                times_list = line.split(",")
+                times_dict = self._extract_times_from_line(line)
 
-                entry_times = []
-                for entry_list in re.compile(self.ENTRY_EXIT_TIMES_REGEX).findall(times_list[0]):
-                    entry_times.append(list(filter(None, entry_list)))  # Filtering out empty strings
-
-                exit_times = []
-                for exit_list in re.compile(self.ENTRY_EXIT_TIMES_REGEX).findall(times_list[1]):
-                    exit_times.append(list(filter(None, exit_list)))  # Filtering out empty strings
-
-                self.processed_rates[dict_key]["entry start"] = Utils.convert_to_24h_format(":".join(entry_times[0]))
-                self.processed_rates[dict_key]["entry end"] = Utils.convert_to_24h_format(":".join(entry_times[1]))
-                self.processed_rates[dict_key]["exit start"] = Utils.convert_to_24h_format(":".join(exit_times[0]))
-                self.processed_rates[dict_key]["exit end"] = Utils.convert_to_24h_format(":".join(exit_times[1]))
+                self.processed_rates[dict_key]["entry start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
+                self.processed_rates[dict_key]["entry end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
+                self.processed_rates[dict_key]["exit start"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][0]))
+                self.processed_rates[dict_key]["exit end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
 
             i += 1
 
