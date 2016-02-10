@@ -1,6 +1,6 @@
 from parker.classes.custom.wilson.rates import WilsonRates
 from parker.classes.core.utils import Utils
-import re
+
 
 class RatesSection(WilsonRates):
     def __init__(self):
@@ -38,5 +38,5 @@ class RatesSection(WilsonRates):
 
             i += 1
 
-        return rate_details
+        return self.processed_rates
 
