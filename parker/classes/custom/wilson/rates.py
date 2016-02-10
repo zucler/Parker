@@ -5,7 +5,15 @@ from parker.classes.core.utils import Utils
 
 class WilsonRates:
 
-    DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    DAYS_OF_WEEK = [
+                        ["Mon", "Monday"],
+                        ["Tue", "Tuesday", "Tues"],
+                        ["Wed", "Wednesday"],
+                        ["Thu", "Thursday", "Thurs"],
+                        ["Fri", "Friday"],
+                        ["Sat", "Saturday"],
+                        ["Sun", "Sunday"]
+                    ]
 
     def __init__(self):
         """Initialize Willsons Parking rates object."""
@@ -17,9 +25,10 @@ class WilsonRates:
         Args:
                 string (str): string to compare
         """
-        for day in self.DAYS_OF_WEEK:
-            if Utils.string_found(day, string):
-                return True
+        for day_list in self.DAYS_OF_WEEK:
+            for day in day_list:
+                if Utils.string_found(day, string):
+                    return True
         return False
 
     def _detect_days_in_range(self, days_range):
@@ -32,7 +41,7 @@ class WilsonRates:
                 Returns list of all the days included in range
         """
         try:
-            self.__start_date, self.__end_date = days_range.split(" - ")
+            self.__start_day, self.__end_day = days_range.split(" - ")
         except Exception:
             return [days_range]
 
@@ -49,15 +58,37 @@ class WilsonRates:
         return self.__list_of_days
 
     def _loop_through_days(self):
-        for day in self.DAYS_OF_WEEK:
-            if self.__start_date == day:
-                self.__range_started = True
+        for day_list in self.DAYS_OF_WEEK:
+            day_added = False
+            for day in day_list:
+                if day_added:
+                    break
 
-            if self.__range_started:
-                self.__list_of_days.append(Utils.day_string_to_digit(day))
+                if self.__start_day.lower() == day.lower():
+                    self.__range_started = True
 
-            if self.__range_started and self.__end_date == day:
-                return True
+                if self.__range_started:
+                    self.__list_of_days.append(Utils.day_string_to_digit(day_list[0]))
+                    day_added = True
+
+                if self.__range_started and self.__end_day.lower() == day.lower():
+                    return True
+
+    def _format_hours_line(self, line):
+        """Remove unnecessary bits from hours string
+
+        Args:
+                line (str): Hours string
+        """
+        return line[:-3].strip()
+
+    def _format_prices_line(self, line):
+        """Remove unnecessary bits from prices string
+
+        Args:
+                line (str): Rate string
+        """
+        return line[1:].strip()
 
     def feed(self, raw_rates):
         """Feed data into object and process it
@@ -224,19 +255,3 @@ class WilsonRates:
                 #             prices[day] = flat_price
 
         return prices
-
-    def _format_hours_line(self, line):
-        """Remove unnecessary bits from hours string
-
-        Args:
-                line (str): Hours string
-        """
-        return line[:-3].strip()
-
-    def _format_prices_line(self, line):
-        """Remove unnecessary bits from prices string
-
-        Args:
-                line (str): Rate string
-        """
-        return line[1:].strip()
