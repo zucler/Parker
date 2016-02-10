@@ -13,6 +13,7 @@ class RatesSection(WilsonRates):
         self.processed_rates['exit_end'] = "23:59"
         self.processed_rates['days'] = ""
         self.processed_rates['prices'] = dict()
+        self.processed_rates['label'] = "Casual"
 
         i = 0
         current_hourly_minutes = 0
