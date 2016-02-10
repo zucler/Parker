@@ -4,6 +4,7 @@ from parker.classes.core.utils import Utils
 
 
 class WilsonRates:
+    ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?"
 
     DAYS_OF_WEEK = [
                         ["Mon", "Monday"],
@@ -18,6 +19,19 @@ class WilsonRates:
     def __init__(self):
         """Initialize Willsons Parking rates object."""
         self.parking_type = "Wilson"
+
+    def _extract_times_from_line(self, line):
+        times_list = line.split(",")
+
+        entry_times = []
+        for entry_list in re.compile(self.ENTRY_EXIT_TIMES_REGEX).findall(times_list[0]):
+            entry_times.append(list(filter(None, entry_list)))  # Filtering out empty strings
+
+        exit_times = []
+        for exit_list in re.compile(self.ENTRY_EXIT_TIMES_REGEX).findall(times_list[1]):
+            exit_times.append(list(filter(None, exit_list)))  # Filtering out empty strings
+
+        return {"entry": entry_times, "exit": exit_times}
 
     def is_a_day(self, string):
         """Detect if string is a day of week
@@ -43,16 +57,19 @@ class WilsonRates:
         try:
             self.__start_day, self.__end_day = days_range.split(" - ")
         except Exception:
-            return [days_range]
+            for day_list in self.DAYS_OF_WEEK:
+                for day in day_list:
+                    if days_range.lower() == day.lower():
+                        return Utils.day_string_to_digit(day_list[0])
 
         self.__range_started = False
         self.__list_of_days = []
         result = False
         max_iterations = 2
         iteration = 1
-        while not result or iteration == max_iterations:
+        while not result and iteration <= max_iterations:
             result = self._loop_through_days()
-            ++iteration
+            iteration += 1
 
         self.__list_of_days.sort()
         return self.__list_of_days
@@ -61,13 +78,11 @@ class WilsonRates:
         for day_list in self.DAYS_OF_WEEK:
             day_added = False
             for day in day_list:
-                if day_added:
-                    break
 
                 if self.__start_day.lower() == day.lower():
                     self.__range_started = True
 
-                if self.__range_started:
+                if self.__range_started and not day_added:
                     self.__list_of_days.append(Utils.day_string_to_digit(day_list[0]))
                     day_added = True
 
