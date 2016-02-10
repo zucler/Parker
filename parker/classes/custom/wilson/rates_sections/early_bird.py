@@ -2,7 +2,7 @@ from parker.classes.custom.wilson.rates import WilsonRates
 from parker.classes.core.utils import Utils
 import re
 
-
+# @TODO: Add Extended Early Bird
 class RatesSection(WilsonRates):
     SUPER_EARLY_BIRD_KEY = "super early bird"
     SUPER_EARLY_BIRD_HTML_TITLES = ["super early bird", "super eb", "super earlybird"]
