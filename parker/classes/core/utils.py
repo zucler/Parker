@@ -20,6 +20,13 @@ class Utils:
         """
         if re.search(r"\b" + re.escape(search_for) + r"\b", search_subject):
             return True
+
+        if search_subject.find(search_for) != -1:  # Test for single special characters
+            return True
+
+        if search_for in search_subject:
+            return True
+
         return False
 
     @staticmethod
@@ -89,3 +96,17 @@ class Utils:
                 return day_number
 
         return False
+
+    @staticmethod
+    def generate_end_html_tag(start_tag):
+        """ Generates end tag based on the start tag
+
+        Args:
+            start_tag (string): Opening HTML tag
+
+        Returns:
+            Returns closing HTML tag
+        """
+        end_tag = start_tag[:1] + "/" + start_tag[1:]
+
+        return end_tag
