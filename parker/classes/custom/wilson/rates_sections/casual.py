@@ -48,5 +48,7 @@ class RatesSection(WilsonRates):
             section_data.remove(line_to_remove)
 
         parking_rates[self.LABEL] = self.processed_rates
-        parking_rates["notes"] = section_data
+
+        if section_data:
+            parking_rates["notes"] = section_data
 
