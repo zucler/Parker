@@ -3,17 +3,19 @@ from parker.classes.core.utils import Utils
 
 
 class RatesSection(WilsonRates):
+    LABEL = "Casual"
+
     def __init__(self):
         WilsonRates.__init__(self)
         self.rates_data = ""
         self.processed_rates = dict()
 
-    def get_details(self, section_data):
+    def get_details(self, section_data, parking_rates):
         self.processed_rates['entry_start'] = "00:00"
         self.processed_rates['exit_end'] = "23:59"
         self.processed_rates['days'] = ""
         self.processed_rates['prices'] = dict()
-        self.processed_rates['label'] = "Casual"
+        self.processed_rates['label'] = self.LABEL
 
         i = 0
         current_hourly_minutes = 0
@@ -39,5 +41,5 @@ class RatesSection(WilsonRates):
 
             i += 1
 
-        return self.processed_rates
+        parking_rates[self.LABEL] = self.processed_rates
 

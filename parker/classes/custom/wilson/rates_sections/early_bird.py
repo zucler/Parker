@@ -4,9 +4,11 @@ import re
 
 # @TODO: Add Extended Early Bird
 class RatesSection(WilsonRates):
+    SUPER_EARLY_BIRD_LABEL = "Super Early Bird"
     SUPER_EARLY_BIRD_KEY = "super early bird"
     SUPER_EARLY_BIRD_HTML_TITLES = ["super early bird", "super eb", "super earlybird"]
     EARLY_BIRD_KEY = "early bird"
+    EARLY_BIRD_LABEL = "Early Bird"
     EARLY_BIRD_HTML_TITLES = ["early bird", "eb", "earlybird"]
 
     def __init__(self):
@@ -21,7 +23,7 @@ class RatesSection(WilsonRates):
         self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
-    def get_details(self, raw_data):
+    def get_details(self, raw_data, parking_rates):
         """ Extracts early bird rates information from raw data provided
 
         Args:
@@ -31,13 +33,15 @@ class RatesSection(WilsonRates):
             Returns dictionary of Early Bird and Super Early Bird data
         """
         self.rates_data = raw_data
-        self.processed_rates['label'] = "Early Bird"
 
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
         self._process_days()
 
-        return self.processed_rates
+        parking_rates[self.EARLY_BIRD_LABEL] = self.processed_rates[self.EARLY_BIRD_KEY]
+
+        if self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
+            parking_rates[self.SUPER_EARLY_BIRD_LABEL] = self.processed_rates[self.SUPER_EARLY_BIRD_KEY]
 
     def _process_days(self):
         for line in self.rates_data:
