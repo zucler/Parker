@@ -4,6 +4,7 @@ import re
 
 
 class RatesSection(WilsonRates):
+    LABEL = "Night"
 
     def __init__(self):
         WilsonRates.__init__(self)
@@ -11,8 +12,9 @@ class RatesSection(WilsonRates):
         self.processed_rates = dict()
         self.processed_rates['rates'] = dict()
 
-    def get_details(self, section_data):
-        self.processed_rates['label'] = "Night"
+    def get_details(self, section_data, parking_rates):
+
+        self.processed_rates['label'] = self.LABEL
         line_index = 0
         i = 0
         for line in section_data:
@@ -31,12 +33,12 @@ class RatesSection(WilsonRates):
 
                 self.processed_rates["entry start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
 
-                if times_dict['exit'][0]:
+                if times_dict['exit']:
                     self.processed_rates["exit end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][0]))
                 else:
-                    self.processed_rate["exit end"] = "23:59"  # @TODO: Fix me
+                    self.processed_rates["exit end"] = "23:59"  # @TODO: Fix me
 
             line_index += 1
 
-        return self.processed_rate
+        parking_rates[self.LABEL] = self.processed_rates
 
