@@ -18,6 +18,7 @@ class RatesSection(WilsonRates):
         self.processed_rates['label'] = self.LABEL
 
         i = 0
+        processed_lines = []
         current_hourly_minutes = 0
         for line in section_data:
             if Utils.string_found('hrs', line):
@@ -39,7 +40,13 @@ class RatesSection(WilsonRates):
                 else:
                     self.processed_rates['prices'][1440] = prices_str  # 1440 is 24 hours in minutes
 
+                processed_lines.append(line)
+                processed_lines.append(next_line)
             i += 1
 
+        for line_to_remove in processed_lines:
+            section_data.remove(line_to_remove)
+
         parking_rates[self.LABEL] = self.processed_rates
+        parking_rates["notes"] = section_data
 
