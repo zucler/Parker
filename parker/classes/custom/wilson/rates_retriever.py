@@ -2,7 +2,7 @@
 
 from parker.classes.core.parser import CoreParser
 from parker.classes.core.utils import Utils
-from parker.classes.custom.wilson.rates import Rates
+from parker.classes.custom.wilson.rates import WilsonRates
 
 
 class RatesRetriever(CoreParser):
@@ -55,7 +55,7 @@ class RatesRetriever(CoreParser):
             True or False
         """
         rates_html = self.get_data_by_class_name("section", "rates", html)
-
+        parking_rates = dict()
         for section_name in rates_html.keys():
             if section_name not in self.SECTION_NAMES:
                 # TODO: Write into log
@@ -65,9 +65,7 @@ class RatesRetriever(CoreParser):
                 mod = __import__("parker.classes.custom.wilson.rates_sections." + section_name.lower().replace(" ", "_"), fromlist=['RatesSection'])
                 RatesSection = getattr(mod, 'RatesSection')
                 rates_section = RatesSection()
-
-                if section_name == "Early Bird":  # For debugging
-                    section_details = rates_section.get_details(rates_html[section_name])
+                rates_section.get_details(rates_html[section_name], parking_rates)
 
 
-        Utils.pprint(rates_html)
+        Utils.pprint(parking_rates)
