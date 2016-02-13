@@ -18,7 +18,8 @@ class RatesSection(WilsonRates):
 
         """
         WilsonRates.__init__(self)
-        self.rates_data = ""
+        self.rates_data = []
+        self.unprocessed_raw_data = []
         self.processed_rates = dict()
         self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
@@ -33,18 +34,24 @@ class RatesSection(WilsonRates):
             Returns dictionary of Early Bird and Super Early Bird data
         """
         self.rates_data = raw_data
+        self.unprocessed_raw_data = raw_data
 
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
         self._process_days()
 
         parking_rates[self.EARLY_BIRD_LABEL] = self.processed_rates[self.EARLY_BIRD_KEY]
+        parking_rates[self.EARLY_BIRD_LABEL]['label'] = self.EARLY_BIRD_LABEL
+        parking_rates[self.EARLY_BIRD_LABEL]['notes'] = self.rates_data
 
         if self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
             parking_rates[self.SUPER_EARLY_BIRD_LABEL] = self.processed_rates[self.SUPER_EARLY_BIRD_KEY]
+            parking_rates[self.SUPER_EARLY_BIRD_LABEL]['label'] = self.SUPER_EARLY_BIRD_LABEL
+            parking_rates[self.SUPER_EARLY_BIRD_LABEL]['notes'] = self.rates_data
+
 
     def _process_days(self):
-        for line in self.rates_data:
+        for line in self.unprocessed_raw_data:
             if self.is_a_day(line):  # Check if a line has days information
                 # Check if days are specific to a certain rate
                 if self._is_title_in_line(line, self.SUPER_EARLY_BIRD_HTML_TITLES):
@@ -57,6 +64,8 @@ class RatesSection(WilsonRates):
                     for rate_type in self.processed_rates.keys():
                         if "price" in self.processed_rates[rate_type].keys():
                             self.processed_rates[rate_type]["days"] = self._detect_days_in_range(line)
+
+                self.rates_data.remove(line)
 
     def _extract_day_string(self, titles_list, line):
         for title in titles_list:
@@ -75,6 +84,7 @@ class RatesSection(WilsonRates):
             Stores processed data in self.processed_rates dictionary
         """
         i = 0
+        lines_processed = []
         for line in self.rates_data:
             next_line = ""
             if not i + 1 == len(self.rates_data):
@@ -83,10 +93,13 @@ class RatesSection(WilsonRates):
             # If current line is a header, and next one is price
             if self._do_save_rates(titles_list, dict_key, line, next_line):
                 self.processed_rates[dict_key]["price"] = next_line
+                lines_processed.append(line)
+                lines_processed.append(next_line)
                 self.processed_rates[dict_key]["rate_type"] = "flat"
             # Else if current line is Entry & Exit times
             elif self._do_save_times_data(titles_list, dict_key, line):
                 times_dict = self._extract_times_from_line(line)
+                lines_processed.append(line)
 
                 self.processed_rates[dict_key]["entry start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
                 self.processed_rates[dict_key]["entry end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
@@ -94,6 +107,9 @@ class RatesSection(WilsonRates):
                 self.processed_rates[dict_key]["exit end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
 
             i += 1
+
+        for line_to_remove in lines_processed:
+            self.rates_data.remove(line_to_remove)
 
     def _do_save_rates(self, titles_list, dict_key, line, next_line):
         if Utils.string_found("$", next_line):
