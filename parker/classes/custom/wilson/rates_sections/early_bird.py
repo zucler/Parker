@@ -42,13 +42,15 @@ class RatesSection(WilsonRates):
 
         parking_rates[self.EARLY_BIRD_LABEL] = self.processed_rates[self.EARLY_BIRD_KEY]
         parking_rates[self.EARLY_BIRD_LABEL]['label'] = self.EARLY_BIRD_LABEL
-        parking_rates[self.EARLY_BIRD_LABEL]['notes'] = self.rates_data
+
+        if self.rates_data:
+            parking_rates[self.EARLY_BIRD_LABEL]['notes'] = self.rates_data
 
         if self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
             parking_rates[self.SUPER_EARLY_BIRD_LABEL] = self.processed_rates[self.SUPER_EARLY_BIRD_KEY]
             parking_rates[self.SUPER_EARLY_BIRD_LABEL]['label'] = self.SUPER_EARLY_BIRD_LABEL
-            parking_rates[self.SUPER_EARLY_BIRD_LABEL]['notes'] = self.rates_data
-
+            if self.rates_data:
+                parking_rates[self.SUPER_EARLY_BIRD_LABEL]['notes'] = self.rates_data
 
     def _process_days(self):
         for line in self.unprocessed_raw_data:
