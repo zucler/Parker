@@ -1,6 +1,6 @@
-from parker.classes.custom.wilson.rates import WilsonRates
-from parker.classes.custom.wilson.rates_sections import casual
 from parker.classes.core.utils import Utils
+from parker.classes.custom.wilson.rates import WilsonRates
+
 
 class RatesSection(WilsonRates):
     LABEL = "Weekend"
@@ -19,9 +19,10 @@ class RatesSection(WilsonRates):
                 return
 
         # Checking for hourly rate
-        if Utils.string_found("hrs", self.rates_data[0]):
+        if self._is_hourly_rate(self.rates_data[0]):
             self._extract_hourly_rates()
             self.processed_rates['days'] = [6, 7]
+            self.processed_rates['rate_type'] = "hourly"
 
         # Checking for flat rates
         if self.is_a_day(self.rates_data[0]):

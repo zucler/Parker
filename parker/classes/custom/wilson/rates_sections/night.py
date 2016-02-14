@@ -1,6 +1,5 @@
-from parker.classes.custom.wilson.rates import WilsonRates
 from parker.classes.core.utils import Utils
-import re
+from parker.classes.custom.wilson.rates import WilsonRates
 
 
 class RatesSection(WilsonRates):
@@ -46,4 +45,3 @@ class RatesSection(WilsonRates):
 
         if self.rates_data:
             parking_rates[self.LABEL]["notes"] = self.rates_data
-
