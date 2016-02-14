@@ -24,31 +24,29 @@ class RatesSection(WilsonRates):
         self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
-    def get_details(self, raw_data, parking_rates):
+    def get_details(self, section_data, parking_rates):
         """ Extracts early bird rates information from raw data provided
 
         Args:
-            raw_data (list): List of Early bird lines
+            section_data (list): List of Early bird lines
 
         Returns:
             Returns dictionary of Early Bird and Super Early Bird data
         """
-        self.rates_data = raw_data
-        self.unprocessed_raw_data = raw_data
+        self.rates_data = section_data
+        self.unprocessed_raw_data = section_data
 
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
         self._process_days()
 
         parking_rates[self.EARLY_BIRD_LABEL] = self.processed_rates[self.EARLY_BIRD_KEY]
-        parking_rates[self.EARLY_BIRD_LABEL]['label'] = self.EARLY_BIRD_LABEL
 
         if self.rates_data:
             parking_rates[self.EARLY_BIRD_LABEL]['notes'] = self.rates_data
 
         if self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
             parking_rates[self.SUPER_EARLY_BIRD_LABEL] = self.processed_rates[self.SUPER_EARLY_BIRD_KEY]
-            parking_rates[self.SUPER_EARLY_BIRD_LABEL]['label'] = self.SUPER_EARLY_BIRD_LABEL
             if self.rates_data:
                 parking_rates[self.SUPER_EARLY_BIRD_LABEL]['notes'] = self.rates_data
 
