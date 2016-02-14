@@ -7,8 +7,6 @@ class RatesSection(WilsonRates):
 
     def __init__(self):
         WilsonRates.__init__(self)
-        self.rates_data = ""
-        self.processed_rates = dict()
 
     def get_details(self, section_data, parking_rates):
         self.processed_rates['entry_start'] = "00:00"
@@ -24,5 +22,5 @@ class RatesSection(WilsonRates):
         parking_rates[self.LABEL] = self.processed_rates
 
         if section_data:
-            parking_rates["notes"] = section_data
+            parking_rates[self.LABEL]["notes"] = section_data
 

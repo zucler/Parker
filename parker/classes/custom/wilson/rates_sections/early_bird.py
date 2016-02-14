@@ -18,9 +18,7 @@ class RatesSection(WilsonRates):
 
         """
         WilsonRates.__init__(self)
-        self.rates_data = []
         self.unprocessed_raw_data = []
-        self.processed_rates = dict()
         self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
@@ -84,7 +82,6 @@ class RatesSection(WilsonRates):
             Stores processed data in self.processed_rates dictionary
         """
         i = 0
-        lines_processed = []
         for line in self.rates_data:
             next_line = ""
             if not i + 1 == len(self.rates_data):
@@ -93,13 +90,13 @@ class RatesSection(WilsonRates):
             # If current line is a header, and next one is price
             if self._do_save_rates(titles_list, dict_key, line, next_line):
                 self.processed_rates[dict_key]["price"] = next_line
-                lines_processed.append(line)
-                lines_processed.append(next_line)
+                self.processed_lines.append(line)
+                self.processed_lines.append(next_line)
                 self.processed_rates[dict_key]["rate_type"] = "flat"
             # Else if current line is Entry & Exit times
             elif self._do_save_times_data(titles_list, dict_key, line):
                 times_dict = self._extract_times_from_line(line)
-                lines_processed.append(line)
+                self.processed_lines.append(line)
 
                 self.processed_rates[dict_key]["entry start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
                 self.processed_rates[dict_key]["entry end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
@@ -108,7 +105,7 @@ class RatesSection(WilsonRates):
 
             i += 1
 
-        for line_to_remove in lines_processed:
+        for line_to_remove in self.processed_lines:
             self.rates_data.remove(line_to_remove)
 
     def _do_save_rates(self, titles_list, dict_key, line, next_line):
