@@ -10,12 +10,12 @@ class RatesSection(WilsonRates):
         WilsonRates.__init__(self)
         self.processed_rates['rates'] = dict()
 
-    def get_details(self, section_data, parking_rates):
+    def get_details(self, parking_rates):
         line_index = 0
         i = 0
-        for line in section_data:
-            if not line_index + 1 == len(section_data):
-                next_line = section_data[line_index + 1]
+        for line in self.rates_data:
+            if not line_index + 1 == len(self.rates_data):
+                next_line = self.rates_data[line_index + 1]
 
             if self.is_a_day(line):
                 self.processed_rates['rates'][i] = dict()
@@ -40,11 +40,10 @@ class RatesSection(WilsonRates):
 
             line_index += 1
 
-        for line_to_remove in self.processed_lines:
-            section_data.remove(line_to_remove)
+        self._unset_processed_lines()
 
         parking_rates[self.LABEL] = self.processed_rates
 
-        if section_data:
-            parking_rates[self.LABEL]["notes"] = section_data
+        if self.rates_data:
+            parking_rates[self.LABEL]["notes"] = self.rates_data
 
