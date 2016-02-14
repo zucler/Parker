@@ -13,7 +13,6 @@ class RatesSection(WilsonRates):
         self.processed_rates['rates'] = dict()
 
     def get_details(self, section_data, parking_rates):
-        self.processed_rates['label'] = self.LABEL
         line_index = 0
         i = 0
         processed_lines = []
@@ -24,7 +23,7 @@ class RatesSection(WilsonRates):
             if self.is_a_day(line):
                 self.processed_rates['rates'][i] = dict()
                 self.processed_rates['rates'][i]['days'] = self._detect_days_in_range(line)
-                self.processed_rates['rates'][i]['price'] = next_line
+                self.processed_rates['rates'][i]['prices'] = next_line
                 self.processed_rates['rates'][i]['rate_type'] = "flat"
                 processed_lines.append(line)
                 processed_lines.append(next_line)
