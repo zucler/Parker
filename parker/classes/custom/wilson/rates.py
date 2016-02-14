@@ -19,6 +19,10 @@ class WilsonRates:
     def __init__(self):
         """Initialize Willsons Parking rates object."""
         self.parking_type = "Wilson"
+        self.rates_data = ""
+        self.processed_rates = dict()
+        self.processed_lines = []
+
 
     def _extract_times_from_line(self, line):
         times_list = line.split(",")
@@ -32,6 +36,33 @@ class WilsonRates:
             exit_times.append(list(filter(None, exit_list)))  # Filtering out empty strings
 
         return {"entry": entry_times, "exit": exit_times}
+
+    def _extract_hourly_rates(self, section_data):
+        i = 0
+        current_hourly_minutes = 0
+        for line in section_data:
+            if Utils.string_found('hrs', line):
+                if not i + 1 == len(section_data):
+                    next_line = section_data[i + 1]
+
+                hours_str = self._format_hours_line(line)
+                prices_str = self._format_prices_line(next_line)
+
+                hours_arr = hours_str.split(" - ")
+                if len(hours_arr) == 2:
+                    offset = float(hours_arr[1]) - float(hours_arr[0])
+                    current_hourly_minutes += 30
+                    self.processed_rates['prices'][current_hourly_minutes] = prices_str
+
+                    if offset == 1.0:
+                        current_hourly_minutes += 30
+                        self.processed_rates['prices'][current_hourly_minutes] = prices_str
+                else:
+                    self.processed_rates['prices'][1440] = prices_str  # 1440 is 24 hours in minutes
+
+                self.processed_lines.append(line)
+                self.processed_lines.append(next_line)
+            i += 1
 
     def is_a_day(self, string):
         """Detect if string is a day of week
