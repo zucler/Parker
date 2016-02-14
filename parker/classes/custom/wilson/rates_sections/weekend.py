@@ -8,20 +8,19 @@ class RatesSection(WilsonRates):
     def __init__(self):
         WilsonRates.__init__(self)
 
-    def get_details(self, section_data, parking_rates):
-        self.rates_data = section_data
+    def get_details(self, parking_rates):
         self.processed_rates['prices'] = dict()
         self.processed_rates['days'] = []
         parking_rates[self.LABEL] = dict()
 
         # Ignore if casual rates apply
         if len(self.rates_data) == 1:
-            if Utils.string_found("casual rates apply", section_data[0].lower()):
+            if Utils.string_found("casual rates apply", self.rates_data[0].lower()):
                 return
 
         # Checking for hourly rate
         if Utils.string_found("hrs", self.rates_data[0]):
-            self._extract_hourly_rates(self.rates_data)
+            self._extract_hourly_rates()
             self.processed_rates['days'] = [6, 7]
 
         # Checking for flat rates
@@ -29,7 +28,7 @@ class RatesSection(WilsonRates):
             line_index = 0
             for line in self.rates_data:
                 if not line_index + 1 == len(self.rates_data):
-                    next_line = section_data[line_index + 1]
+                    next_line = self.rates_data[line_index + 1]
 
                 if self.is_a_day(line):
                     self.processed_rates['days'].append(self._detect_days_in_range(line))
@@ -41,10 +40,9 @@ class RatesSection(WilsonRates):
 
                 line_index += 1
 
-        for line_to_remove in self.processed_lines:
-            self.rates_data.remove(line_to_remove)
+        self._unset_processed_lines()
 
         parking_rates[self.LABEL] = self.processed_rates
 
-        if section_data:
+        if self.rates_data:
             parking_rates[self.LABEL]["notes"] = self.rates_data
