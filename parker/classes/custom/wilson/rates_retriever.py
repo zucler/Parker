@@ -67,5 +67,7 @@ class RatesRetriever(CoreParser):
                 rates_section = RatesSection()
                 rates_section.get_details(rates_html[section_name], parking_rates)
 
+                # if section_name == "Weekend":
+                #     rates_section.get_details(rates_html[section_name], parking_rates)
 
         Utils.pprint(parking_rates)
