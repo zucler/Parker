@@ -1,15 +1,18 @@
-from parker.classes.custom.wilson.rates import WilsonRates
 from parker.classes.core.utils import Utils
-import re
+from parker.classes.custom.wilson.rates import WilsonRates
+
 
 # @TODO: Add Extended Early Bird
 class RatesSection(WilsonRates):
-    SUPER_EARLY_BIRD_LABEL = "Super Early Bird"
-    SUPER_EARLY_BIRD_KEY = "super early bird"
-    SUPER_EARLY_BIRD_HTML_TITLES = ["super early bird", "super eb", "super earlybird"]
-    EARLY_BIRD_KEY = "early bird"
-    EARLY_BIRD_LABEL = "Early Bird"
-    EARLY_BIRD_HTML_TITLES = ["early bird", "eb", "earlybird"]
+    # Need to create a new dictionary with all the possible titles that exist fot the section. It will help us to
+    # filter incorrect section titles in _is_title_in_line() function
+
+    SECTIONS_DICTIONARY = {
+        "Super Early Bird": ["Super Early Bird", "Super EB", "Super Earlybird"],
+        "Early Bird": ["Early Bird", "EB", "Earlybird"]
+    }
+
+    SECTIONS_PROCESSING_ORDER = ["Super Early Bird", "Early Bird"]  # EARLY BIRD SHOULD ALWAYS BE PROCESSED LAST
 
     def __init__(self):
         """ Init Early Bird Rates Section
@@ -19,8 +22,6 @@ class RatesSection(WilsonRates):
         """
         WilsonRates.__init__(self)
         self.unprocessed_raw_data = []
-        self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
-        self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
     def get_details(self, parking_rates):
         """ Extracts early bird rates information from raw data provided
@@ -31,46 +32,50 @@ class RatesSection(WilsonRates):
         Returns:
             Returns dictionary of Early Bird and Super Early Bird data
         """
-        self.unprocessed_raw_data = self.rates_data
+        self.unprocessed_raw_data = self.rates_data.copy()
 
-        self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
-        self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
+        for section_key in self.SECTIONS_PROCESSING_ORDER:
+            self._process_rates(section_key, self.SECTIONS_DICTIONARY[section_key])
+            self._unset_processed_lines()
+
         self._process_days()
-
-        parking_rates[self.EARLY_BIRD_LABEL] = self.processed_rates[self.EARLY_BIRD_KEY]
+        self._unset_processed_lines()
 
         if self.rates_data:
-            parking_rates[self.EARLY_BIRD_LABEL]['notes'] = self.rates_data
+            for rate_type in self.processed_rates.keys():
+                if "prices" in self.processed_rates[rate_type].keys():
+                    self.processed_rates[rate_type]['notes'] = self.rates_data
 
-        if self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
-            parking_rates[self.SUPER_EARLY_BIRD_LABEL] = self.processed_rates[self.SUPER_EARLY_BIRD_KEY]
-            if self.rates_data:
-                parking_rates[self.SUPER_EARLY_BIRD_LABEL]['notes'] = self.rates_data
+        for rate_type in self.processed_rates.keys():
+            if "prices" in self.processed_rates[rate_type].keys():
+                parking_rates[rate_type] = self.processed_rates[rate_type]
 
     def _process_days(self):
         for line in self.unprocessed_raw_data:
             if self.is_a_day(line):  # Check if a line has days information
-                # Check if days are specific to a certain rate
-                if self._is_title_in_line(line, self.SUPER_EARLY_BIRD_HTML_TITLES):
-                    line = self._extract_day_string(self.SUPER_EARLY_BIRD_HTML_TITLES, line)
-                    self.processed_rates[self.SUPER_EARLY_BIRD_KEY]['days'] = self._detect_days_in_range(line)
-                elif self._is_title_in_line(line, self.EARLY_BIRD_HTML_TITLES):
-                    line = self._extract_day_string(self.EARLY_BIRD_HTML_TITLES, line)
-                    self.processed_rates[self.EARLY_BIRD_KEY]['days'] = self._detect_days_in_range(line)
-                else:
+                line_saved = False
+                for section_key in self.SECTIONS_PROCESSING_ORDER:
+                    section_titles = self.SECTIONS_DICTIONARY[section_key]
+                    if self._is_title_in_line(line, section_titles) and "days" not in self.processed_rates[section_key].keys():
+                        line = self._extract_day_string(section_titles, line)
+                        self.processed_rates[section_key]['days'] = self._detect_days_in_range(line)
+                        line_saved = True
+
+                if not line_saved:
                     for rate_type in self.processed_rates.keys():
-                        if "price" in self.processed_rates[rate_type].keys():
+                        if "prices" in self.processed_rates[rate_type].keys():
                             self.processed_rates[rate_type]["days"] = self._detect_days_in_range(line)
 
-                self.rates_data.remove(line)
+                if line in self.rates_data:
+                    self.processed_lines.append(line)
 
     def _extract_day_string(self, titles_list, line):
         for title in titles_list:
-            if Utils.string_found(title, line.lower()):
-                line = line.lower().replace(title, "").strip()
+            if Utils.string_found(title.lower(), line.lower()):
+                line = line.lower().replace(title.lower(), "").strip()
                 return line
 
-    def _process_rates(self, titles_list, dict_key):
+    def _process_rates(self, dict_key, titles_list):
         """ Parses raw rates data provided and builds a structured dictionary of information
 
         Args:
@@ -80,6 +85,7 @@ class RatesSection(WilsonRates):
         Returns:
             Stores processed data in self.processed_rates dictionary
         """
+        self.processed_rates[dict_key] = dict()
         i = 0
         for line in self.rates_data:
             next_line = ""
@@ -88,7 +94,7 @@ class RatesSection(WilsonRates):
 
             # If current line is a header, and next one is price
             if self._do_save_rates(titles_list, dict_key, line, next_line):
-                self.processed_rates[dict_key]["price"] = next_line
+                self.processed_rates[dict_key]["prices"] = next_line
                 self.processed_lines.append(line)
                 self.processed_lines.append(next_line)
                 self.processed_rates[dict_key]["rate_type"] = "flat"
@@ -104,13 +110,11 @@ class RatesSection(WilsonRates):
 
             i += 1
 
-        self._unset_processed_lines()
-
     def _do_save_rates(self, titles_list, dict_key, line, next_line):
         if Utils.string_found("$", next_line):
             if self._is_title_in_line(line, titles_list):
                 return True
-            elif self._is_single_rate_parking(dict_key):
+            elif self._is_single_rate_parking() and dict_key == "Early Bird":
                 return True
 
         return False
@@ -119,15 +123,24 @@ class RatesSection(WilsonRates):
         if Utils.string_found("entry", line.lower()):
             if self._is_title_in_line(line, titles_list):
                 return True
-            elif self._is_single_rate_parking(dict_key):
+            elif self._is_single_rate_parking():
                 return True
 
         return False
 
-    def _is_single_rate_parking(self, dict_key):
-        # Super EB does not exist, everything default to just EB
-        if dict_key == self.EARLY_BIRD_KEY and "price" not in self.processed_rates[self.SUPER_EARLY_BIRD_KEY]:
+    def _is_single_rate_parking(self):
+        count = 0
+        for section_name in self.SECTIONS_PROCESSING_ORDER:
+            for line in self.unprocessed_raw_data:
+                if self._is_title_in_line(line, self.SECTIONS_DICTIONARY[section_name]):
+                    count += 1
+                    break
+
+        if count == 1 or count == 0:  # Added this and exception for test purposes. Once confirmed that logic is working, both should be removed
             return True
+
+        if count > 1:
+            return False
 
         return False
 
@@ -141,8 +154,8 @@ class RatesSection(WilsonRates):
         Returns:
 
         """
+        # THIS FUNCTION ONLY WORKS IF EARLY BIRD IS PROCESSED LAST
         for title in header_titles:
-            if Utils.string_found(title, line.lower()):
+            if Utils.string_found(title.lower(), line.lower()):
                 return True
-
         return False
