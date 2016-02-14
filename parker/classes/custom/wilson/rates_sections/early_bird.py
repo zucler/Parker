@@ -22,17 +22,16 @@ class RatesSection(WilsonRates):
         self.processed_rates[self.SUPER_EARLY_BIRD_KEY] = dict()
         self.processed_rates[self.EARLY_BIRD_KEY] = dict()
 
-    def get_details(self, section_data, parking_rates):
+    def get_details(self, parking_rates):
         """ Extracts early bird rates information from raw data provided
 
         Args:
-            section_data (list): List of Early bird lines
+            parking_rates (list): List of all parking rates
 
         Returns:
             Returns dictionary of Early Bird and Super Early Bird data
         """
-        self.rates_data = section_data
-        self.unprocessed_raw_data = section_data
+        self.unprocessed_raw_data = self.rates_data
 
         self._process_rates(self.SUPER_EARLY_BIRD_HTML_TITLES, self.SUPER_EARLY_BIRD_KEY)
         self._process_rates(self.EARLY_BIRD_HTML_TITLES, self.EARLY_BIRD_KEY)
@@ -105,8 +104,7 @@ class RatesSection(WilsonRates):
 
             i += 1
 
-        for line_to_remove in self.processed_lines:
-            self.rates_data.remove(line_to_remove)
+        self._unset_processed_lines()
 
     def _do_save_rates(self, titles_list, dict_key, line, next_line):
         if Utils.string_found("$", next_line):

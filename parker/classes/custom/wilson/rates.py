@@ -23,6 +23,12 @@ class WilsonRates:
         self.processed_rates = dict()
         self.processed_lines = []
 
+    def set_section_data(self, section_data):
+        self.rates_data = section_data
+
+    def _unset_processed_lines(self):
+        for line_to_remove in self.processed_lines:
+            self.rates_data.remove(line_to_remove)
 
     def _extract_times_from_line(self, line):
         times_list = line.split(",")
@@ -37,13 +43,13 @@ class WilsonRates:
 
         return {"entry": entry_times, "exit": exit_times}
 
-    def _extract_hourly_rates(self, section_data):
+    def _extract_hourly_rates(self):
         i = 0
         current_hourly_minutes = 0
-        for line in section_data:
+        for line in self.rates_data:
             if Utils.string_found('hrs', line):
-                if not i + 1 == len(section_data):
-                    next_line = section_data[i + 1]
+                if not i + 1 == len(self.rates_data):
+                    next_line = self.rates_data[i + 1]
 
                 hours_str = self._format_hours_line(line)
                 prices_str = self._format_prices_line(next_line)
