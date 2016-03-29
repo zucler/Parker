@@ -6,17 +6,17 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
 import parker.wsgi
-from parker.classes.utils import Utils
+from parker.classes.core.utils import Utils
 from parker.models import Parking, RateType, RatePrice
 
 sys.path.append('/srv/prod/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 # carparkings = Parking.objects.all()
-carparkings = Parking.objects.filter(parkingID=2)
+carparkings = Parking.objects.filter(parkingID=4)
 for carpark in carparkings:
-    mod = __import__("parker.classes.parsers." + carpark.parking_type.lower() + ".parser", fromlist=['RatesParser'])
-    RatesParser = getattr(mod, 'RatesParser')
+    mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever", fromlist=['RatesRetriever'])
+    RatesRetriever = getattr(mod, 'RatesRetriever')
     url = carpark.uri
     # use firefox to get page with javascript generated content
     with closing(Firefox()) as browser:
@@ -25,9 +25,8 @@ for carpark in carparkings:
         WebDriverWait(browser, timeout=10).until(
                 lambda x: x.find_element_by_class_name('rates'))
         # store it as string variable
-        parser = RatesParser()
-        rates = parser.get_prices_information(browser.page_source)
-        Utils.pprint(rates.rates)
+        parser = RatesRetriever()
+        parser.update_rates(browser.page_source)
         exit()
         # save rates into DB
         for rate_name, rate_data in rates.types.items():
