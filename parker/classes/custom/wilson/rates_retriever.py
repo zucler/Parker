@@ -24,6 +24,10 @@ class RatesRetriever(CoreParser):
         Returns:
             True or False
         """
+        rates = self.get_rates(html)
+        Utils.pprint(rates)
+
+    def get_rates(self, html):
         rates_html = self.get_data_by_class_name("section", "rates", html)
         parking_rates = dict()
         for section_name in rates_html.keys():
@@ -31,13 +35,12 @@ class RatesRetriever(CoreParser):
                 # TODO: Write into log
                 print("Unknown section name: " + section_name)
             else:
-                mod = __import__("parker.classes.custom.wilson.rates_sections." + section_name.lower().replace(" ", "_"), fromlist=['RatesSection'])
+                mod = __import__(
+                    "parker.classes.custom.wilson.rates_sections." + section_name.lower().replace(" ", "_"),
+                    fromlist=['RatesSection'])
                 RatesSection = getattr(mod, 'RatesSection')
                 rates_section = RatesSection()
                 rates_section.set_section_data(rates_html[section_name])
                 rates_section.get_details(parking_rates)
 
-                # if section_name == "Weekend":
-                #     rates_section.get_details(rates_html[section_name], parking_rates)
-
-        Utils.pprint(parking_rates)
+        return parking_rates
