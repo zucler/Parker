@@ -12,6 +12,12 @@ class RatesSection(WilsonRates):
     def get_details(self, parking_rates):
         line_index = 0
         i = 0
+
+        # Ignore if casual rates apply
+        if len(self.rates_data) == 1:
+            if Utils.string_found("casual rates apply", self.rates_data[0].lower()):
+                return
+
         for line in self.rates_data:
             if not line_index + 1 == len(self.rates_data):
                 next_line = self.rates_data[line_index + 1]
