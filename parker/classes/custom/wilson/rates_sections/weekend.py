@@ -9,14 +9,14 @@ class RatesSection(WilsonRates):
         WilsonRates.__init__(self)
 
     def get_details(self, parking_rates):
-        self.processed_rates['prices'] = dict()
-        self.processed_rates['days'] = []
-        parking_rates[self.LABEL] = dict()
-
         # Ignore if casual rates apply
         if len(self.rates_data) == 1:
             if Utils.string_found("casual rates apply", self.rates_data[0].lower()):
                 return
+
+        self.processed_rates['prices'] = dict()
+        self.processed_rates['days'] = []
+        parking_rates[self.LABEL] = dict()
 
         # Checking for hourly rate
         if self._is_hourly_rate(self.rates_data[0]):
