@@ -29,12 +29,20 @@ class WilssonsRateParserMethodTest(TestCase):
                                       'rate_type': 'hourly'},
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry end': '09:30',
-                                          'entry start': '06:30',
+                                          'entry start': '08:00',
                                           'exit end': '19:30',
-                                          'exit start': '16:00',
-                                          'notes': ['Proceed to Level 7 and validate ticket'],
+                                          'exit start': '15:00',
                                           'prices': '$24.00',
+                                          'notes': ["Proceed to Level 7 and validate ticket"],
                                           'rate_type': 'flat'},
+                           'Super Early Bird': {'days': [1, 2, 3, 4, 5],
+                                                'entry end': '08:00',
+                                                'entry start': '06:00',
+                                                'exit end': '19:30',
+                                                'exit start': '15:00',
+                                                'prices': '$19.00',
+                                                'notes': ["Proceed to Level 7 and validate ticket"],
+                                                'rate_type': 'flat'},
                            'Night': {'entry start': '17:00',
                                      'exit end': '23:59',
                                      'rates': {0: {'days': [1, 2, 3, 7],
@@ -54,6 +62,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                                   1440: '25.00'},
                                        'rate_type': 'hourly'}}
 
+        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
 
     def test_get_prices_information_park_id_2(self):
@@ -98,6 +107,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                        'notes': ['Flate rate per exit, per day'],
                                        'prices': '$15.00'}}
 
+        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
 
     def test_get_prices_information_park_id_3(self):
@@ -114,13 +124,13 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'Motorcycle parkers to park in yellow '
                                                 'designated areas on Level 4 and contact '
                                                 'Attendant in Office prior to departure'],
-                                      'prices': {30: '5.00',
-                                                 60: '15.00',
-                                                 90: '25.00',
-                                                 120: '25.00',
-                                                 150: '29.00',
-                                                 180: '29.00',
-                                                 1440: '35.00'},
+                                      'prices': {30: '6.00',
+                                                 60: '16.00',
+                                                 90: '26.00',
+                                                 120: '26.00',
+                                                 150: '30.00',
+                                                 180: '30.00',
+                                                 1440: '36.00'},
                                       'rate_type': 'hourly'},
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry end': '09:30',
@@ -148,6 +158,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                                    'rate_type': 'flat'}}},
                            'Weekend': {}}
 
+        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
 
     def test_get_prices_information_park_id_4(self):
@@ -200,6 +211,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                        'notes': ['Flat rate per exit, per day'],
                                        'prices': '$9.00'}}
 
+        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
 
     def get_rates(self, url):
