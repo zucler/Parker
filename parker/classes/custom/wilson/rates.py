@@ -61,9 +61,11 @@ class WilsonRates:
                     current_hourly_minutes += 30
                     self.processed_rates['prices'][current_hourly_minutes] = prices_str
 
-                    if offset == 1.0:
-                        current_hourly_minutes += 30
-                        self.processed_rates['prices'][current_hourly_minutes] = prices_str
+                    if offset > 0.5:
+                        number_of_repetitions = offset / 0.5
+                        for z in range(1, int(number_of_repetitions)):
+                            current_hourly_minutes += 30
+                            self.processed_rates['prices'][current_hourly_minutes] = prices_str
                 else:
                     self.processed_rates['prices'][1440] = prices_str  # 1440 is 24 hours in minutes
 

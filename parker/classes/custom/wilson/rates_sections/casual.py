@@ -20,4 +20,4 @@ class RatesSection(WilsonRates):
         parking_rates[self.LABEL] = self.processed_rates
 
         if self.rates_data:
-            parking_rates[self.LABEL]["notes"] = self.rates_data
+            parking_rates[self.LABEL]["notes"] = list(filter(None, self.rates_data)) # Filtering out empty strings
