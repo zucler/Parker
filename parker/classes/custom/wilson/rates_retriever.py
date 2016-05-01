@@ -63,10 +63,12 @@ class RatesRetriever(CoreParser):
             rate = rates[rate_section]
             if rate['rate_type'].lower() == "hourly":
                 if rate_section.lower() == "casual":
-                    self._store_casual_rate(carpark, rate_section, rate, day)
+                    self._store_casual_rate(carpark, rate)
                 else:
                     print("Unknown hourly rate: " + rate_section)
                     return
+            elif rate['rate_type'].lower() == "flat":
+                self._store_flat_rate(carpark, rate_section, rate)
 
     def _store_casual_rate (self, carpark, rate):
         """ Stores rate data for casual rate type
@@ -101,4 +103,29 @@ class RatesRetriever(CoreParser):
 
             if carpark_rate_price.price != price:
                 carpark_rate_price.price = price
+                carpark_rate_price.save()
+
+    def _store_flat_rate(self, carpark, rate_section, rate):
+        for day_of_week in rate['days_range']:
+            save_carpark_rate = False
+            carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_section,
+                                                                   rate_type=rate['rate_type'],
+                                                                   day_of_week=day_of_week)
+
+            if carpark_rate.start_time != rate['start']:
+                carpark_rate.start_time = rate['start']
+                save_carpark_rate = True
+
+            if carpark_rate.end_time != rate['end']:
+                carpark_rate.end_time = rate['end']
+                save_carpark_rate = True
+
+            if save_carpark_rate:
+                carpark_rate.save()
+
+            carpark_rate_price, created = RatePrice.objects.get_or_create(rateID=carpark_rate, duration=0)
+            price_for_day = rate['prices'][day_of_week]
+            if carpark_rate_price != price_for_day:
+                carpark_rate_price.price = price_for_day
+                print(carpark_rate_price.price + " = " + price_for_day)
                 carpark_rate_price.save()
