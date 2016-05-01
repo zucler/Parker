@@ -1,10 +1,12 @@
 __author__ = 'mpak'
-
 from contextlib import closing
+from decimal import *
 
 from django.test import TestCase
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
+
+from parker.models import Parking, RateType, RatePrice
 
 
 class WilssonsRateParserMethodTest(TestCase):
@@ -215,9 +217,6 @@ class WilssonsRateParserMethodTest(TestCase):
     #     self.assertDictEqual(expected_result, rates)
 
     def test_get_prices_information_park_id_5(self):
-        url = "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
-
-        rates = self.get_rates(url)
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
@@ -225,28 +224,36 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'Car Park Closed: Fri-25 Dec',
                                                 'Fri-01 Jan'
                                                 ],
-                                      'prices': {30: '0.00',
-                                                 60: '0.00',
-                                                 90: '0.00',
-                                                 120: '0.00',
-                                                 150: '3.00',
-                                                 180: '7.00',
-                                                 210: '9.00',
-                                                 240: '11.00',
-                                                 270: '13.00',
-                                                 300: '15.00',
-                                                 330: '23.00',
-                                                 360: '23.00',
-                                                 390: '32.00',
-                                                 420: '32.00',
-                                                 1440: '42.00'},
+                                      'prices': {30: "0.00",
+                                                 60: "0.00",
+                                                 90: "0.00",
+                                                 120: "0.00",
+                                                 150: "3.00",
+                                                 180: "7.00",
+                                                 210: "9.00",
+                                                 240: "11.00",
+                                                 270: "13.00",
+                                                 300: "15.00",
+                                                 330: "23.00",
+                                                 360: "23.00",
+                                                 390: "32.00",
+                                                 420: "32.00",
+                                                 1440: "42.00"},
                                       'rate_type': 'hourly'},
                            }
+        url = "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
+        carpark = Parking.objects.create(parkingID=5, label="East Village Car Park",
+                                         address="4 Defries Avenue, Zetland",
+                                         lat=-33.905890, long=151.210313, parking_type="Wilson", uri=url)
 
-        self.maxDiff = None
-        self.assertDictEqual(expected_result, rates)
+        self.update_rates(carpark)
+        rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
+        prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
 
-    def get_rates(self, url):
+        for price in prices:
+            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+
+    def update_rates(self, carpark):
         mod = __import__("parker.classes.custom.wilson.rates_retriever",
                          fromlist=['RatesRetriever'])
 
@@ -254,12 +261,12 @@ class WilssonsRateParserMethodTest(TestCase):
 
         # use firefox to get page with javascript generated content
         with closing(Firefox()) as browser:
-            browser.get(url)
+            browser.get(carpark.uri)
             # wait for the page to load
             WebDriverWait(browser, timeout=10).until(
                 lambda x: x.find_element_by_class_name('rates'))
             # store it as string variable
             parser = RatesRetriever()
-            rates = parser.get_rates(browser.page_source)
+            rates = parser.update_rates(carpark, browser.page_source)
 
             return rates
