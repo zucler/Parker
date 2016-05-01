@@ -246,14 +246,18 @@ class WilssonsRateParserMethodTest(TestCase):
                                          address="4 Defries Avenue, Zetland",
                                          lat=-33.905890, long=151.210313, parking_type="Wilson", uri=url)
 
-        self.update_rates(carpark)
+        rates, html = self.get_rates(url)
+        self.maxDiff = None
+        self.assertDictEqual(expected_result, rates)
+
+        self.update_rates(carpark, html)
         rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
         prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
 
         for price in prices:
             self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
 
-    def update_rates(self, carpark):
+    def get_rates(self, url):
         mod = __import__("parker.classes.custom.wilson.rates_retriever",
                          fromlist=['RatesRetriever'])
 
@@ -261,12 +265,23 @@ class WilssonsRateParserMethodTest(TestCase):
 
         # use firefox to get page with javascript generated content
         with closing(Firefox()) as browser:
-            browser.get(carpark.uri)
+            browser.get(url)
             # wait for the page to load
             WebDriverWait(browser, timeout=10).until(
                 lambda x: x.find_element_by_class_name('rates'))
             # store it as string variable
             parser = RatesRetriever()
-            rates = parser.update_rates(carpark, browser.page_source)
+            rates = parser.get_rates(browser.page_source)
 
-            return rates
+            return rates, browser.page_source
+
+    def update_rates(selfs, carpark, html):
+        mod = __import__("parker.classes.custom.wilson.rates_retriever",
+                         fromlist=['RatesRetriever'])
+
+        RatesRetriever = getattr(mod, 'RatesRetriever')
+        parser = RatesRetriever()
+        parser.update_rates(carpark, html)
+
+
+
