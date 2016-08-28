@@ -1,4 +1,5 @@
 __author__ = 'Maxim Pak'
+import pprint
 import re
 from datetime import datetime
 
@@ -19,6 +20,13 @@ class Utils:
         """
         if re.search(r"\b" + re.escape(search_for) + r"\b", search_subject):
             return True
+
+        if search_subject.find(search_for) != -1:  # Test for single special characters
+            return True
+
+        if search_for in search_subject:
+            return True
+
         return False
 
     @staticmethod
@@ -58,3 +66,47 @@ class Utils:
             time = datetime.strptime(time, hours_only_12_format).strftime(hours_minutes_24_format)
 
         return time
+
+    @staticmethod
+    def pprint(to_print):
+        """ Pretty prints variable
+        Args:
+            to_print (mixed): Variable to print
+
+        Returns:
+            void
+        """
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(to_print)
+
+    @staticmethod
+    def day_string_to_digit(day_string):
+        days = {
+            1: ("mon", "monday"),
+            2: ("tue", "tuesday"),
+            3: ("wed", "wednesday"),
+            4: ("thu", "thursday"),
+            5: ("fri", "friday"),
+            6: ("sat", "saturday"),
+            7: ("sun", "sunday")
+        }
+
+        for day_number in days.keys():
+            if day_string.lower() in days[day_number]:
+                return day_number
+
+        return False
+
+    @staticmethod
+    def generate_end_html_tag(start_tag):
+        """ Generates end tag based on the start tag
+
+        Args:
+            start_tag (string): Opening HTML tag
+
+        Returns:
+            Returns closing HTML tag
+        """
+        end_tag = start_tag[:1] + "/" + start_tag[1:]
+
+        return end_tag

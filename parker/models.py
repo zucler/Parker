@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import time
 
 PARKING_TYPES = (
     ('WILSON', 'Wilson'),
@@ -14,11 +15,11 @@ RATE_TYPES = (
 class Parking(models.Model):
     parkingID = models.AutoField(primary_key=True, unique=True)
     label = models.CharField(max_length=500)
-    address = models.TextField()
+    address = models.TextField(default="")
     lat = models.DecimalField(max_digits=10, decimal_places=6, default=0)
     long = models.DecimalField(max_digits=10, decimal_places=6, default=0)
     parking_type = models.CharField(max_length=150, choices=PARKING_TYPES)
-    places_of_interest = models.TextField()     # TODO: Need to be a separate table
+    places_of_interest = models.TextField(default="")     # TODO: Need to be a separate table
     uri = models.TextField()
 
     def __str__(self):
@@ -31,10 +32,10 @@ class RateType(models.Model):
     """
     parkingID = models.ForeignKey(Parking, on_delete=models.CASCADE, db_column='parkingID')
     rateID = models.AutoField(primary_key=True, unique=True)
-    day_of_week = models.SmallIntegerField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    rate_type = models.CharField(max_length=50, choices=RATE_TYPES, default="Flat")
+    day_of_week = models.SmallIntegerField(default=0)
+    start_time = models.TimeField(default=time(0, 0, 0))
+    end_time = models.TimeField(default=time(0, 0, 0))
+    rate_type = models.CharField(max_length=50, choices=RATE_TYPES)
     label = models.CharField(max_length=50, default="")
 
     def __str__(self):
