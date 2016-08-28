@@ -34,7 +34,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
-    'polls',
     'parker',
 )
 
@@ -61,7 +60,7 @@ DATABASES = {
         'NAME': 'parker',  # Or path to database file if using sqlite3.
         'USER': 'remoteroot',  # Not used with sqlite3.
         'PASSWORD': 'carparker5ql',  # Not used with sqlite3.
-        'HOST': 'ec2-52-62-15-148.ap-southeast-2.compute.amazonaws.com',  # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'ec2-52-62-202-224.ap-southeast-2.compute.amazonaws.com',  # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
     }
 }
