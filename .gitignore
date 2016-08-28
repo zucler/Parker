@@ -66,3 +66,6 @@ target/
 #ctp
 docs/ctp/
 __history/
+*.bat
+.sass-cache/
+venv/
