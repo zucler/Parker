@@ -13,7 +13,7 @@ class WilssonsRateParserMethodTest(TestCase):
     # def test_get_prices_information_park_id_1(self):
     #     url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
     #
-    #     rates = self.get_rates(url)
+    #     rates, html = self.get_rates(url)
     #     expected_result = {'Casual': {'days': '',
     #                                   'entry_start': '00:00',
     #                                   'exit_end': '23:59',
@@ -70,7 +70,7 @@ class WilssonsRateParserMethodTest(TestCase):
     # def test_get_prices_information_park_id_2(self):
     #     url = "https://www.wilsonparking.com.au/park/2135_St-Martins-Tower-Car-Park_190-202-Clarence-Street-Sydney"
     #
-    #     rates = self.get_rates(url)
+    #     rates, html = self.get_rates(url)
     #     expected_result = {'Casual': {'days': '',
     #                                   'entry_start': '00:00',
     #                                   'exit_end': '23:59',
@@ -115,7 +115,7 @@ class WilssonsRateParserMethodTest(TestCase):
     # def test_get_prices_information_park_id_3(self):
     #     url = "https://www.wilsonparking.com.au/park/2047_Harbourside-Car-Park_100-Murray-Street-Pyrmont"
     #
-    #     rates = self.get_rates(url)
+    #     rates, html = self.get_rates(url)
     #     expected_result = {'Casual': {'days': '',
     #                                   'entry_start': '00:00',
     #                                   'exit_end': '23:59',
@@ -166,7 +166,7 @@ class WilssonsRateParserMethodTest(TestCase):
     # def test_get_prices_information_park_id_4(self):
     #     url = "https://www.wilsonparking.com.au/park/2024_175-Liverpool-St-Car-Park_26-Nithsdale-Street-Sydney"
     #
-    #     rates = self.get_rates(url)
+    #     rates, html = self.get_rates(url)
     #     expected_result = {'Casual': {'days': '',
     #                                   'entry_start': '00:00',
     #                                   'exit_end': '23:59',
