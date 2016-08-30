@@ -216,13 +216,15 @@ class WilssonsRateParserMethodTest(TestCase):
     #     self.maxDiff = None
     #     self.assertDictEqual(expected_result, rates)
 
+    """
+    This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
+    """
     def test_get_prices_information_park_id_5(self):
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
                                       'notes': ['Public Holidays:  Casual Rates Apply',
-                                                'Car Park Closed: Fri-25 Dec',
-                                                'Fri-01 Jan'
+                                                'Car Park Closed: Fri-25 Dec & Fri-01 Jan'
                                                 ],
                                       'prices': {30: "0.00",
                                                  60: "0.00",
