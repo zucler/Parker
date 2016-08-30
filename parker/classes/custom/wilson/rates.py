@@ -157,4 +157,9 @@ class WilsonRates:
         Args:
                 line (str): Rate string
         """
-        return line[1:].strip()
+        if Utils.string_found("$", line):
+            return line[1:].strip()
+        elif Utils.string_found("free", line.lower()):
+            return "0.00"
+        else:
+            return line
