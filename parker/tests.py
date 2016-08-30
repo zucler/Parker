@@ -215,38 +215,79 @@ class WilssonsRateParserMethodTest(TestCase):
     #
     #     self.maxDiff = None
     #     self.assertDictEqual(expected_result, rates)
+    #
+    # """ This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
+    # """
+    # def test_get_prices_information_park_id_5(self):
+    #     expected_result = {'Casual': {'days': '',
+    #                                   'entry_start': '00:00',
+    #                                   'exit_end': '23:59',
+    #                                   'notes': ['Public Holidays:  Casual Rates Apply',
+    #                                             'Car Park Closed: Fri-25 Dec & Fri-01 Jan'
+    #                                             ],
+    #                                   'prices': {30: "0.00",
+    #                                              60: "0.00",
+    #                                              90: "0.00",
+    #                                              120: "0.00",
+    #                                              150: "3.00",
+    #                                              180: "7.00",
+    #                                              210: "9.00",
+    #                                              240: "11.00",
+    #                                              270: "13.00",
+    #                                              300: "15.00",
+    #                                              330: "23.00",
+    #                                              360: "23.00",
+    #                                              390: "32.00",
+    #                                              420: "32.00",
+    #                                              1440: "42.00"},
+    #                                   'rate_type': 'hourly'},
+    #                        }
+    #     url = "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
+    #     carpark = Parking.objects.create(parkingID=5, label="East Village Car Park",
+    #                                      address="4 Defries Avenue, Zetland",
+    #                                      lat=-33.905890, long=151.210313, parking_type="Wilson", uri=url)
+    #
+    #     rates, html = self.get_rates(url)
+    #     self.maxDiff = None
+    #     self.assertDictEqual(expected_result, rates)
+    #
+    #     self.update_rates(carpark, html)
+    #     rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
+    #     prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
+    #
+    #     for price in prices:
+    #         self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
 
-    """
-    This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
-    """
-    def test_get_prices_information_park_id_5(self):
+    def test_get_prices_information_park_id_6(self):
+        """This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
+        """
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
-                                      'notes': ['Public Holidays:  Casual Rates Apply',
-                                                'Car Park Closed: Fri-25 Dec & Fri-01 Jan'
+                                      'notes': ['Lost ticket $45.00.',
+                                                'Public Holidays: Casual Rates Apply'
                                                 ],
                                       'prices': {30: "0.00",
                                                  60: "0.00",
                                                  90: "0.00",
                                                  120: "0.00",
-                                                 150: "3.00",
-                                                 180: "7.00",
-                                                 210: "9.00",
-                                                 240: "11.00",
+                                                 150: "0.00",
+                                                 180: "0.00",
+                                                 210: "6.00",
+                                                 240: "9.00",
                                                  270: "13.00",
-                                                 300: "15.00",
-                                                 330: "23.00",
-                                                 360: "23.00",
-                                                 390: "32.00",
-                                                 420: "32.00",
-                                                 1440: "42.00"},
+                                                 300: "16.00",
+                                                 330: "20.00",
+                                                 360: "25.00",
+                                                 390: "30.00",
+                                                 420: "40.00",
+                                                 1440: "45.00"},
                                       'rate_type': 'hourly'},
                            }
-        url = "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
-        carpark = Parking.objects.create(parkingID=5, label="East Village Car Park",
-                                         address="4 Defries Avenue, Zetland",
-                                         lat=-33.905890, long=151.210313, parking_type="Wilson", uri=url)
+        url = "https://www.wilsonparking.com.au/park/2219_Macquarie-Shopping-Centre-Car-Park_Cnr-Herring--Waterloo-Roads-North-Ryde-"
+        carpark = Parking.objects.create(parkingID=6, label="Macquarie Shopping Centre Car Park",
+                                         address="Cnr Herring & Waterloo Roads, North Ryde",
+                                         lat=-33.776880, long=151.118162, parking_type="Wilson", uri=url)
 
         rates, html = self.get_rates(url)
         self.maxDiff = None
@@ -284,6 +325,3 @@ class WilssonsRateParserMethodTest(TestCase):
         RatesRetriever = getattr(mod, 'RatesRetriever')
         parser = RatesRetriever()
         parser.update_rates(carpark, html)
-
-
-
