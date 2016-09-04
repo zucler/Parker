@@ -40,16 +40,9 @@ function initMap() {
 		nLat = ne.lat();
 		eLong = ne.lng();
 
-		minLat = Math.min(sLat, nLat);
-		maxLat = Math.max(sLat, nLat);
+		debug("s: " + sLat + ", w: " + wLong + "<br>n: " + nLat + ", e: " + eLong);
 
-		// FIXME: Will be a problem in case of 180 meridian crossing
-		minLong = Math.min(wLong, eLong);
-		maxLong = Math.max(wLong, eLong);
-
-		debug("minLat: " + minLat + ", minLong: " + minLong + "<br>maxLat: " + maxLat + ", maxLong: " + maxLong);
-
-		findParkingsByLatlong(minLat, maxLat, minLong, maxLong);
+		findParkingsByLatlong(sLat, wLong, nLat, eLong);
 	}
 
 	map.addListener('bounds_changed', function() {
@@ -70,14 +63,14 @@ function initMap() {
 }
 
 
-function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
+function findParkingsByLatlong(s, w, n, e) {
 	$.ajax({
 		method: "GET",
 		url: "/api/parkings",
-		data: { "minlat": minlat,
-						"maxlat": maxlat,
-						"minlong": minlong,
-						"maxlong": maxlong },
+		data: { "s": s,
+						"w": w,
+						"n": n,
+						"e": e },
 		success: function(data) {
 			if (data.length > 0) {
 				processParkingData(data);
