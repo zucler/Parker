@@ -111,19 +111,6 @@ class WilssonsRateParserMethodTest(TestCase):
         for single_day_price in weekend_prices:
             self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
 
-    def _get_stored_prices(self, carpark, rate_label, rate_type, day_of_week=-1):
-        # rates are QuerySets
-        rates = RateType.objects.filter(parkingID=carpark, label=rate_label, rate_type=rate_type)
-
-        if day_of_week > -1:
-            rates = rates.filter(day_of_week=day_of_week)
-
-        prices = []
-        for rate in rates:
-            prices.append(RatePrice.objects.filter(rateID=rate).order_by('duration'))
-
-        return prices
-
     def _get_prices_information_park_id_2(self):
         url = "https://www.wilsonparking.com.au/park/2135_St-Martins-Tower-Car-Park_190-202-Clarence-Street-Sydney"
 
@@ -131,8 +118,7 @@ class WilssonsRateParserMethodTest(TestCase):
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
-                                      'notes': ['Motorbike Rate $10.00',
-                                                'Public Holidays: Weekend Rates Apply'],
+                                      'notes': ['Public Holidays: Weekend Rates Apply'],
                                       'prices': {30: '9.00',
                                                  60: '29.00',
                                                  90: '54.00',
@@ -146,21 +132,28 @@ class WilssonsRateParserMethodTest(TestCase):
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry_end': '09:30',
                                           'entry_start': '08:00',
-                                          'exit end': '19:00',
-                                          'exit start': '15:30',
-                                          'prices': '24.00',
+                                          'exit_end': '19:00',
+                                          'exit_start': '15:30',
+                                          'prices': '26.00',
                                           'rate_type': 'flat'},
-                           'Night': {'entry_start': '17:00',
-                                     'exit end': '23:59',
-                                     'rates': {0: {'days': [1, 2, 3, 4, 5],
-                                                   'prices': '$10.00',
-                                                   'rate_type': 'flat'}}},
+                           'Night': {'rates': {0: {'days': [1, 2, 3],
+                                                   'entry_start': '17:00',
+                                                   'exit_end': '23:59',
+                                                   'prices': '10.00',
+                                                   'rate_type': 'flat'},
+                                               1: {'days': [4, 5],
+                                                   'entry_start': '17:00',
+                                                   'exit_end': '23:59',
+                                                   'prices': '12.00',
+                                                   'rate_type': 'flat'}
+                                               }
+                                     },
                            'Super Early Bird': {'days': [1, 2, 3, 4, 5],
                                                 'entry_end': '08:00',
                                                 'entry_start': '07:00',
-                                                'exit end': '19:00',
-                                                'exit start': '15:30',
-                                                'prices': '22.00',
+                                                'exit_end': '19:00',
+                                                'exit_start': '15:30',
+                                                'prices': '24.00',
                                                 'rate_type': 'flat'},
                            'Weekend': {'days': [[6, 7]],
                                        'notes': ['Flate rate per exit, per day'],
@@ -435,3 +428,16 @@ class WilssonsRateParserMethodTest(TestCase):
         RatesRetriever = getattr(mod, 'RatesRetriever')
         parser = RatesRetriever()
         parser.update_rates(carpark, html)
+
+    def _get_stored_prices(self, carpark, rate_label, rate_type, day_of_week=-1):
+        # rates are QuerySets
+        rates = RateType.objects.filter(parkingID=carpark, label=rate_label, rate_type=rate_type)
+
+        if day_of_week > -1:
+            rates = rates.filter(day_of_week=day_of_week)
+
+        prices = []
+        for rate in rates:
+            prices.append(RatePrice.objects.filter(rateID=rate).order_by('duration'))
+
+        return prices
