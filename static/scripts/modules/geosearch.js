@@ -3,6 +3,8 @@ var map;
 var boundsEventTimer;
 boundsTimerDelay = 250;
 
+var parkingInfoWindow;
+
 var markersParking = new Array();
 var windowsParking = new Array();
 
@@ -40,16 +42,9 @@ function initMap() {
 		nLat = ne.lat();
 		eLong = ne.lng();
 
-		minLat = Math.min(sLat, nLat);
-		maxLat = Math.max(sLat, nLat);
+		debug("s: " + sLat + ", w: " + wLong + "<br>n: " + nLat + ", e: " + eLong);
 
-		// FIXME: Will be a problem in case of 180 meridian crossing
-		minLong = Math.min(wLong, eLong);
-		maxLong = Math.max(wLong, eLong);
-
-		debug("minLat: " + minLat + ", minLong: " + minLong + "<br>maxLat: " + maxLat + ", maxLong: " + maxLong);
-
-		findParkingsByLatlong(minLat, maxLat, minLong, maxLong);
+		findParkingsByLatlong(sLat, wLong, nLat, eLong);
 	}
 
 	map.addListener('bounds_changed', function() {
@@ -67,17 +62,19 @@ function initMap() {
 	createSearchControl(controlDiv);
 	controlDiv.index = 1;
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
+
+	parkingInfoWindow = new google.maps.InfoWindow({content: "Loading..."})
 }
 
 
-function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
+function findParkingsByLatlong(s, w, n, e) {
 	$.ajax({
 		method: "GET",
 		url: "/api/parkings",
-		data: { "minlat": minlat,
-						"maxlat": maxlat,
-						"minlong": minlong,
-						"maxlong": maxlong },
+		data: { "s": s,
+						"w": w,
+						"n": n,
+						"e": e },
 		success: function(data) {
 			if (data.length > 0) {
 				processParkingData(data);
@@ -93,8 +90,13 @@ function findParkingsByLatlong(minlat, maxlat, minlong, maxlong) {
 
 
 function processParkingData(data) {
-	derefMarkers(markersParking);
+	// derefMarkers(markersParking);
 	derefWindows(windowsParking);
+
+	data = filterDataByMarkers(data, markersParking)
+	// TODO: Also clean unused markers (those who out of screen)
+
+	console.log("Filtered data size: " + data.length);
 
 	// FIXME: When moving or zooming, markers and windows will disappear.
 	// Need to make workaround to not delete opened window.
@@ -116,41 +118,50 @@ function processParkingData(data) {
 				title: dataItem.label,
 			});
 
+		marker.parkingID = dataItem.parkingID;
+
 		var ratetype = dataItem['ratetype'][0];
+		var ratetypeInfo = "";
 
-		var ratetypeInfo =
-			"DayOfWeek: " + ratetype['day_of_week'] + "<br>" +
-			"Start time: " + ratetype['start_time'] + "<br>" +
-			"End time: " + ratetype['end_time'] + "<br>" +
-			"Rate Type: " + ratetype['rate_type'] + "<br>" +
-			"Label: " + ratetype['label'] + "<br>";
+		if (typeof ratetype !== 'undefined'){
+			ratetypeInfo =
+				"DayOfWeek: " + ratetype['day_of_week'] + "<br>" +
+				"Start time: " + ratetype['start_time'] + "<br>" +
+				"End time: " + ratetype['end_time'] + "<br>" +
+				"Rate Type: " + ratetype['rate_type'] + "<br>" +
+				"Label: " + ratetype['label'] + "<br>";
 
-		var priceTable = "";
+			var priceTable = "";
 
-		ratetype.rateprice.forEach(function(rpItem) {
-			priceTable += "<tr>" +
-				"<td>" + rpItem.rateID_id + "</td>" +
-				"<td>" + rpItem.duration + "</td>" +
-				"<td>" + rpItem.price + "</td>" +
-				"</tr>";
-		})
+			ratetype.rateprice.forEach(function(rpItem) {
+				priceTable += "<tr>" +
+					"<td>" + rpItem.rateID_id + "</td>" +
+					"<td>" + rpItem.duration + "</td>" +
+					"<td>" + rpItem.price + "</td>" +
+					"</tr>";
+			})
 
-		priceTable = "<table><th>RateID</th><th>Duration</th><th>Price</th>" + priceTable + "</table>";
+			priceTable = "<table><th>RateID</th><th>Duration</th><th>Price</th>" + priceTable + "</table>";
 
-		ratetypeInfo += "<br>Prices:<br>" + priceTable;
+			ratetypeInfo += "<br>Prices:<br>" + priceTable;
+		}
 
 		var infowindow = new google.maps.InfoWindow({
 			content: dataItem.label + "<br>Address: " + dataItem.address + "<br>" + ratetypeInfo,
 			//TODO: More info
 		});
 
+		var content = dataItem.label + "<br>Address: " + dataItem.address + "<br>" + ratetypeInfo;
+
+		marker.infoWindowContent = content
+
 		marker.addListener('click', function() {
-				windowsParking.forEach(function(window){ window.close(); })
-				infowindow.open(map, marker); // FIXME: Window position has erroneous offset
+				parkingInfoWindow.close();
+				parkingInfoWindow.setContent(marker.infoWindowContent);
+				parkingInfoWindow.open(map, marker); // FIXME: Window position has erroneous offset
 			});
 
 		markersParking.push(marker);
-		windowsParking.push(infowindow);
 	});
 
 }
@@ -198,6 +209,24 @@ function createSearchControl(parentDiv) {
 	controlUI.appendChild(span);
 }
 
+// Reuses markers that already exist
+// Removes items from data array of associated markers
+// Not yet true: Assumes that there is no possibility to have two parkings at exactly same position
+// Returns filtered data items array
+function filterDataByMarkers(itemsArray, markerArray) {
+	markerArray.forEach(function(marker) {
+		currentParkingID = marker.parkingID;
+
+		// Look for already existing items
+		itemsArray = itemsArray.filter(function(item, index, arr) {
+			return item.parkingID != currentParkingID;
+		})
+
+      //marker.setMap(null);
+    });
+
+	return itemsArray
+}
 
 function derefMarkers(markerArray) {
 	markerArray.forEach(function(marker) {
