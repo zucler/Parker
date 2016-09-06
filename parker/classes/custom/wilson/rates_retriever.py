@@ -61,26 +61,39 @@ class RatesRetriever(CoreParser):
         """
         for rate_section in rates.keys():
             rate = rates[rate_section]
-            if rate['rate_type'].lower() == "hourly":
-                if rate_section.lower() == "casual":
-                    self._store_casual_rate(carpark, rate)
-                else:
-                    print("Unknown hourly rate: " + rate_section)
-                    return
-            elif rate['rate_type'].lower() == "flat":
-                self._store_flat_rate(carpark, rate_section, rate)
+            # Night can have multiple different rates for different days of week
+            if rate_section.lower() == "night":
+                for index, single_rate in rate['rates'].items():
+                    self._store_individual_rate(carpark, rate_section, single_rate)
+            else:
+                self._store_individual_rate(carpark, rate_section, rate)
 
-    def _store_casual_rate (self, carpark, rate):
+    def _store_individual_rate(self, carpark, rate_section, rate):
+        """ Stores individual rates
+
+        Args:
+            carpark (Parking): Parking object
+            rate_section (str): Name of rate
+            rate (dict): Dictionary storing rates data
+
+        """
+        if rate['rate_type'].lower() == "hourly":
+            self._store_hourly_rate(carpark, rate_section, rate)
+        elif rate['rate_type'].lower() == "flat":
+            self._store_flat_rate(carpark, rate_section, rate)
+
+    def _store_hourly_rate (self, carpark, rate_section, rate):
         """ Stores rate data for casual rate type
 
         Args:
             carpark (Parking): Parking object
+            rate_section (str): Name of rate
             rate (dict): Dictionary storing rates data
 
         Returns:
 
         """
-        carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label="Casual",
+        carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_section,
                                                                rate_type=rate['rate_type'],
                                                                day_of_week=0)
 
@@ -106,25 +119,25 @@ class RatesRetriever(CoreParser):
                 carpark_rate_price.save()
 
     def _store_flat_rate(self, carpark, rate_section, rate):
-        for day_of_week in rate['days_range']:
+        for day_of_week in rate['days']:
             save_carpark_rate = False
             carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_section,
                                                                    rate_type=rate['rate_type'],
                                                                    day_of_week=day_of_week)
 
-            if carpark_rate.start_time != rate['start']:
-                carpark_rate.start_time = rate['start']
+            if carpark_rate.start_time != rate['entry_start']:
+                carpark_rate.start_time = rate['entry_start']
                 save_carpark_rate = True
 
-            if carpark_rate.end_time != rate['end']:
-                carpark_rate.end_time = rate['end']
+            if carpark_rate.end_time != rate['exit_end']:
+                carpark_rate.end_time = rate['exit_end']
                 save_carpark_rate = True
 
             if save_carpark_rate:
                 carpark_rate.save()
 
             carpark_rate_price, created = RatePrice.objects.get_or_create(rateID=carpark_rate, duration=0)
-            price_for_day = rate['prices'][day_of_week]
+            price_for_day = rate['prices']
             if carpark_rate_price != price_for_day:
                 carpark_rate_price.price = price_for_day
                 print(carpark_rate_price.price + " = " + price_for_day)
