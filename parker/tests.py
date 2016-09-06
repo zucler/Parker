@@ -13,7 +13,8 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        self._get_prices_information_park_id_1()
+        # self._get_prices_information_park_id_1()
+        self._get_prices_information_park_id_2()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -90,9 +91,25 @@ class WilssonsRateParserMethodTest(TestCase):
         for price in casual_prices[0]:
             self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
 
+        # Check early bird rates stored in DB
         early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
         for single_day_price in early_bird_prices:
             self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
+        for single_day_price in super_early_bird_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
+        # for single_day_price in night_prices:
+        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
+
+        # Check weekend rates stored in DB
+        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
+        for single_day_price in weekend_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
 
     def _get_stored_prices(self, carpark, rate_label, rate_type, day_of_week=-1):
         # rates are QuerySets
@@ -131,7 +148,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                           'entry_start': '08:00',
                                           'exit end': '19:00',
                                           'exit start': '15:30',
-                                          'prices': '$24.00',
+                                          'prices': '24.00',
                                           'rate_type': 'flat'},
                            'Night': {'entry_start': '17:00',
                                      'exit end': '23:59',
@@ -143,13 +160,12 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'entry_start': '07:00',
                                                 'exit end': '19:00',
                                                 'exit start': '15:30',
-                                                'prices': '$22.00',
+                                                'prices': '22.00',
                                                 'rate_type': 'flat'},
                            'Weekend': {'days': [[6, 7]],
                                        'notes': ['Flate rate per exit, per day'],
-                                       'prices': '$15.00'}}
+                                       'prices': '15.00'}}
 
-        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
 
     def _get_prices_information_park_id_3(self):
