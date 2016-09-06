@@ -19,7 +19,7 @@ class WilsonRates:
     def __init__(self):
         """Initialize Willsons Parking rates object."""
         self.parking_type = "Wilson"
-        self.rates_data = ""
+        self.rates_data = []
         self.processed_rates = dict()
         self.processed_lines = []
 
