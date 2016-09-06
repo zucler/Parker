@@ -140,5 +140,4 @@ class RatesRetriever(CoreParser):
             price_for_day = rate['prices']
             if carpark_rate_price != price_for_day:
                 carpark_rate_price.price = price_for_day
-                print(carpark_rate_price.price + " = " + price_for_day)
                 carpark_rate_price.save()
