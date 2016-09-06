@@ -35,6 +35,7 @@ class RatesSection(WilsonRates):
             # Checking for flat rates
             if self.is_a_day(self.rates_data[0]):
                 line_index = 0
+                self.processed_rates['days'] = []
                 for line in self.rates_data:
                     if not line_index + 1 == len(self.rates_data):
                         next_line = self.rates_data[line_index + 1]
@@ -44,7 +45,7 @@ class RatesSection(WilsonRates):
                         self.processed_lines.append(line)
 
                         if Utils.string_found("$", next_line):
-                            self.processed_rates['prices'] = next_line
+                            self.processed_rates['prices'] = Utils.format_price_string(next_line)
                             self.processed_lines.append(next_line)
 
                     line_index += 1
