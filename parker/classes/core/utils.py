@@ -110,3 +110,17 @@ class Utils:
         end_tag = start_tag[:1] + "/" + start_tag[1:]
 
         return end_tag
+
+    @staticmethod
+    def format_price_string(price_string):
+        """ Return formatted price string
+
+        Args:
+            price_string (string): Price string
+
+        Returns:
+            Returns formatted price string
+        """
+
+        price_string = price_string.replace("$", "")
+        return price_string
