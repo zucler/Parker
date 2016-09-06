@@ -13,7 +13,7 @@ sys.path.append('/srv/prod/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 # carparkings = Parking.objects.all()
-carparkings = Parking.objects.filter(parkingID=6)
+carparkings = Parking.objects.filter(parkingID=7)
 for carpark in carparkings:
     mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever", fromlist=['RatesRetriever'])
     RatesRetriever = getattr(mod, 'RatesRetriever')
@@ -26,6 +26,6 @@ for carpark in carparkings:
                 lambda x: x.find_element_by_class_name('rates'))
         # store it as string variable
         parser = RatesRetriever()
-        parser.update_rates(carpark, browser.page_source)
+        parser._update_rates(carpark, browser.page_source)
         exit()
 

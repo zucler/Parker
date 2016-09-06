@@ -94,7 +94,7 @@ class RatesSection(WilsonRates):
 
             # If current line is a header, and next one is price
             if self._do_save_rates(titles_list, dict_key, line, next_line):
-                self.processed_rates[dict_key]["prices"] = next_line
+                self.processed_rates[dict_key]["prices"] = Utils.format_price_string(next_line)
                 self.processed_lines.append(line)
                 self.processed_lines.append(next_line)
                 self.processed_rates[dict_key]["rate_type"] = "flat"
@@ -103,10 +103,10 @@ class RatesSection(WilsonRates):
                 times_dict = self._extract_times_from_line(line)
                 self.processed_lines.append(line)
 
-                self.processed_rates[dict_key]["entry start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
-                self.processed_rates[dict_key]["entry end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
-                self.processed_rates[dict_key]["exit start"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][0]))
-                self.processed_rates[dict_key]["exit end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
+                self.processed_rates[dict_key]["entry_start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
+                self.processed_rates[dict_key]["entry_end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
+                self.processed_rates[dict_key]["exit_start"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][0]))
+                self.processed_rates[dict_key]["exit_end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
 
             i += 1
 
