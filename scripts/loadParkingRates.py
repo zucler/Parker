@@ -26,6 +26,6 @@ for carpark in carparkings:
                 lambda x: x.find_element_by_class_name('rates'))
         # store it as string variable
         parser = RatesRetriever()
-        parser._update_rates(carpark, browser.page_source)
+        parser.update_rates(carpark, browser.page_source)
         exit()
 
