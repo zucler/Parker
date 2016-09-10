@@ -1,8 +1,10 @@
 __author__ = 'mpak'
+import os
 from contextlib import closing
 from decimal import *
 
 from django.test import TestCase
+from django.conf import settings
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -13,8 +15,8 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        # self._get_prices_information_park_id_1()
-        self._get_prices_information_park_id_2()
+        self._get_prices_information_park_id_1()
+        # self._get_prices_information_park_id_2()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -78,7 +80,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                                   1440: '25.00'},
                                        'rate_type': 'hourly'}}
 
-        rates, html = self._get_rates(url)
+        rates, html = self._get_rates(carpark)
 
         # Check rates returned
         self.assertDictEqual(expected_result, rates)
@@ -113,6 +115,10 @@ class WilssonsRateParserMethodTest(TestCase):
 
     def _get_prices_information_park_id_2(self):
         url = "https://www.wilsonparking.com.au/park/2135_St-Martins-Tower-Car-Park_190-202-Clarence-Street-Sydney"
+
+        carpark = Parking.objects.create(parkingID=2, label="St Martins Tower Car Park",
+                                         address="190-202 Clarence Street, Sydney",
+                                         lat=-33.871420, long=151.203594, parking_type="Wilson", uri=url)
 
         rates, html = self._get_rates(url)
         expected_result = {'Casual': {'days': '',
@@ -156,10 +162,40 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'prices': '24.00',
                                                 'rate_type': 'flat'},
                            'Weekend': {'days': [[6, 7]],
+                                       'rate_type': 'flat',
                                        'notes': ['Flate rate per exit, per day'],
                                        'prices': '15.00'}}
 
+        # Check rates returned
         self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        # Check casual rates stored in DB
+        casual_prices = self._get_stored_prices(carpark, "Casual", "hourly", 0)
+
+        for price in casual_prices[0]:
+            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+
+        # Check early bird rates stored in DB
+        early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
+        for single_day_price in early_bird_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
+        for single_day_price in super_early_bird_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
+        # for single_day_price in night_prices:
+        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
+
+        # Check weekend rates stored in DB
+        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
+        for single_day_price in weekend_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
 
     def _get_prices_information_park_id_3(self):
         url = "https://www.wilsonparking.com.au/park/2047_Harbourside-Car-Park_100-Murray-Street-Pyrmont"
@@ -403,23 +439,20 @@ class WilssonsRateParserMethodTest(TestCase):
         # for price in prices:
         #     self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
 
-    def _get_rates(self, url):
-        mod = __import__("parker.classes.custom.wilson.rates_retriever",
-                         fromlist=['RatesRetriever'])
+    def _get_rates(self, carpark: Parking):
+        for html_file in os.listdir(settings.HTML_CACHE_DIRECTORY):
+            if html_file == "carparkID_" + str(carpark.parkingID) + ".html":
+                rates_file = open(os.path.join(settings.HTML_CACHE_DIRECTORY, html_file), "r")
+                rates_html = rates_file.read()
+                rates_file.close()
 
-        RatesRetriever = getattr(mod, 'RatesRetriever')
-
-        # use firefox to get page with javascript generated content
-        with closing(Firefox()) as browser:
-            browser.get(url)
-            # wait for the page to load
-            WebDriverWait(browser, timeout=10).until(
-                lambda x: x.find_element_by_class_name('rates'))
-            # store it as string variable
-            parser = RatesRetriever()
-            rates = parser.get_rates(browser.page_source)
-
-            return rates, browser.page_source
+                mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever",
+                                 fromlist=['RatesRetriever'])
+                RatesRetriever = getattr(mod, 'RatesRetriever')
+                # store it as string variable
+                parser = RatesRetriever()
+                rates = parser.get_rates(rates_html)
+                return rates, rates_html
 
     def _update_rates(selfs, carpark, html):
         mod = __import__("parker.classes.custom.wilson.rates_retriever",
