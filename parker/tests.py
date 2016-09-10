@@ -1,12 +1,9 @@
 __author__ = 'mpak'
 import os
-from contextlib import closing
 from decimal import *
 
 from django.test import TestCase
 from django.conf import settings
-from selenium.webdriver import Firefox
-from selenium.webdriver.support.ui import WebDriverWait
 
 from parker.models import Parking, RateType, RatePrice
 from parker.classes.core.utils import Utils

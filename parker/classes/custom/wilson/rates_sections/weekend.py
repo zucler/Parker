@@ -36,6 +36,7 @@ class RatesSection(WilsonRates):
             if self.is_a_day(self.rates_data[0]):
                 line_index = 0
                 self.processed_rates['days'] = []
+                self.processed_rates['rate_type'] = "flat"
                 for line in self.rates_data:
                     if not line_index + 1 == len(self.rates_data):
                         next_line = self.rates_data[line_index + 1]
