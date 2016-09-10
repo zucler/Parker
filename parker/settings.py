@@ -130,3 +130,5 @@ STATIC_PRECOMPILER_COMPILERS = (
         "load_paths": ["/path"]
     }),
  )
+
+HTML_CACHE_DIRECTORY = os.path.join(BASE_DIR, "scripts/carparks_rates_html")
