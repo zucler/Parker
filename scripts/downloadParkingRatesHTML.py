@@ -6,8 +6,8 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
 import parker.wsgi
-from parker.classes.core.utils import Utils
 from parker.models import Parking, RateType, RatePrice
+from django.conf import settings
 
 sys.path.append('/srv/prod/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
@@ -26,5 +26,5 @@ for carpark in carparkings:
                 lambda x: x.find_element_by_class_name('rates'))
 
         # store it as string variable
-        with open("carparks_rates_html/carparkID_" + str(carpark.parkingID) + ".html", "w") as out_file:
+        with open(settings.HTML_CACHE_DIRECTORY + "/carparkID_" + str(carpark.parkingID) + ".html", "w") as out_file:
             out_file.write(browser.page_source)
