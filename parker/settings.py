@@ -132,3 +132,5 @@ STATIC_PRECOMPILER_COMPILERS = (
  )
 
 HTML_CACHE_DIRECTORY = os.path.join(BASE_DIR, "scripts/carparks_rates_html")
+HTML_FILE_PREFIX_LENGTH = 10  # carparkID_
+HTML_FILE_SUFFIX_LENGTH = 5  # .html
