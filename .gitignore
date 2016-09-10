@@ -58,3 +58,6 @@ __history/
 .sass-cache/
 /venv/
 !/static/script/lib
+
+#rates html
+scripts/carparks_rates_html/*.html
