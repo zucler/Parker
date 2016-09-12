@@ -27,7 +27,6 @@ class RatesRetriever(CoreParser):
             True or False
         """
         rates = self.get_rates(html)
-        #Utils.pprint(rates)
         self.store_rates(carpark, rates)
 
     def get_rates(self, html):
