@@ -12,14 +12,17 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        # print("Testing carparkID = 1")
-        # self._get_prices_information_park_id_1()
-        #
-        # print("Testing carparkID = 2")
-        # self._get_prices_information_park_id_2()
+        print("Testing carparkID = 1")
+        self._get_prices_information_park_id_1()
+
+        print("Testing carparkID = 2")
+        self._get_prices_information_park_id_2()
 
         print("Testing carparkID = 3")
         self._get_prices_information_park_id_3()
+
+        print("Testing carparkID = 4")
+        self._get_prices_information_park_id_4()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -222,16 +225,17 @@ class WilssonsRateParserMethodTest(TestCase):
     def _get_prices_information_park_id_4(self):
         url = "https://www.wilsonparking.com.au/park/2024_175-Liverpool-St-Car-Park_26-Nithsdale-Street-Sydney"
 
-        rates, html = self._get_rates(url)
+        carpark = Parking.objects.create(parkingID=4, label="Carpark 4",
+                                         address="Whatever",
+                                         lat=-33.871109, long=151.206243, parking_type="Wilson", uri=url)
+
+        rates, html = self._get_rates(carpark)
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
                                       'notes': ['Overnight Rate $30 Monday - Friday',
                                                 'Motorbike Rate $5.00',
-                                                'Public Holidays: Weekend Rates Apply',
-                                                'Saturday April 2nd - car park will be '
-                                                'closed between 7:00am and 7:00pm due to '
-                                                'building maintenance'],
+                                                'Public Holidays: Weekend Rates Apply'],
                                       'prices': {30: '10.00',
                                                  60: '10.00',
                                                  90: '24.00',
@@ -245,34 +249,39 @@ class WilssonsRateParserMethodTest(TestCase):
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry_end': '10:00',
                                           'entry_start': '08:00',
-                                          'exit end': '19:00',
-                                          'exit start': '15:00',
+                                          'exit_end': '19:00',
+                                          'exit_start': '15:00',
                                           'notes': ['Proceed to Level B4 for parking and '
                                                     'validation of ticket'],
-                                          'prices': '$18.00',
+                                          'prices': '18.00',
                                           'rate_type': 'flat'},
-                           'Night': {'entry_start': '17:00',
-                                     'exit end': '23:59',
-                                     'rates': {0: {'days': [1, 2, 3, 4, 5],
-                                                   'prices': '$9.00',
+                           'Night': {'rates': {0: {'days': [1, 2, 3, 4, 5],
+                                                   'entry_start': '17:00',
+                                                   'exit_end': '23:59',
+                                                   'prices': '9.00',
                                                    'rate_type': 'flat'}}},
                            'Super Early Bird': {'days': [1, 2, 3, 4, 5],
                                                 'entry_end': '08:00',
                                                 'entry_start': '07:00',
-                                                'exit end': '19:00',
-                                                'exit start': '15:00',
+                                                'exit_end': '19:00',
+                                                'exit_start': '15:00',
                                                 'notes': ['Proceed to Level B4 for parking '
                                                           'and validation of ticket'],
-                                                'prices': '$16.00',
+                                                'prices': '16.00',
                                                 'rate_type': 'flat'},
                            'Weekend': {'days': [6, 7],
                                        'entry_start': '00:00',
-                                       'exit_end': '23:50',
+                                       'exit_end': '23:59',
                                        'notes': ['Flat rate per exit, per day'],
-                                       'prices': '$9.00'}}
+                                       'prices': '9.00',
+                                       'rate_type': 'flat'
+                                       }}
 
-        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
 
     """ This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
     """
