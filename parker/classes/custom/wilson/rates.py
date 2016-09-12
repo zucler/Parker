@@ -114,7 +114,7 @@ class WilsonRates:
             for day_list in self.DAYS_OF_WEEK:
                 for day in day_list:
                     if days_range.lower() == day.lower():
-                        return Utils.day_string_to_digit(day_list[0])
+                        return [Utils.day_string_to_digit(day_list[0])]
 
         self.__range_started = False
         self.__list_of_days = []
