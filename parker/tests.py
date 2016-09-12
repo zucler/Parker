@@ -12,10 +12,14 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        print("Testing carparkID = 1")
-        self._get_prices_information_park_id_1()
-        print("Testing carparkID = 2")
-        self._get_prices_information_park_id_2()
+        # print("Testing carparkID = 1")
+        # self._get_prices_information_park_id_1()
+        #
+        # print("Testing carparkID = 2")
+        # self._get_prices_information_park_id_2()
+
+        print("Testing carparkID = 3")
+        self._get_prices_information_park_id_3()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -86,31 +90,7 @@ class WilssonsRateParserMethodTest(TestCase):
 
         self._update_rates(carpark, html)
 
-        # Check casual rates stored in DB
-        casual_prices = self._get_stored_prices(carpark, "Casual", "hourly", 0)
-
-        for price in casual_prices[0]:
-            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
-
-        # Check early bird rates stored in DB
-        early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
-        for single_day_price in early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
-        for single_day_price in super_early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
-        # for single_day_price in night_prices:
-        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
-
-        # Check weekend rates stored in DB
-        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
-        for single_day_price in weekend_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
+        self._assert_saved_rates(carpark, expected_result)
 
     def _get_prices_information_park_id_2(self):
         url = "https://www.wilsonparking.com.au/park/2135_St-Martins-Tower-Car-Park_190-202-Clarence-Street-Sydney"
@@ -172,36 +152,16 @@ class WilssonsRateParserMethodTest(TestCase):
 
         self._update_rates(carpark, html)
 
-        # Check casual rates stored in DB
-        casual_prices = self._get_stored_prices(carpark, "Casual", "hourly", 0)
-
-        for price in casual_prices[0]:
-            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
-
-        # Check early bird rates stored in DB
-        early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
-        for single_day_price in early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
-        for single_day_price in super_early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
-        # for single_day_price in night_prices:
-        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
-
-        # Check weekend rates stored in DB
-        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
-        for single_day_price in weekend_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
+        self._assert_saved_rates(carpark, expected_result)
 
     def _get_prices_information_park_id_3(self):
         url = "https://www.wilsonparking.com.au/park/2047_Harbourside-Car-Park_100-Murray-Street-Pyrmont"
 
-        rates, html = self._get_rates(url)
+        carpark = Parking.objects.create(parkingID=3, label="Carpark 3",
+                                         address="Whatever",
+                                         lat=-33.871109, long=151.206243, parking_type="Wilson", uri=url)
+
+        rates, html = self._get_rates(carpark)
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
@@ -223,31 +183,41 @@ class WilssonsRateParserMethodTest(TestCase):
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry_end': '09:30',
                                           'entry_start': '06:00',
-                                          'exit end': '19:00',
-                                          'exit start': '15:00',
+                                          'exit_end': '19:00',
+                                          'exit_start': '15:00',
                                           'notes': ['Have ticket validated by machine on '
                                                     'Level 3 in the morning, proceed to '
                                                     'Level 1 or 2 for parking'],
-                                          'prices': '$15.00',
+                                          'prices': '15.00',
                                           'rate_type': 'flat'},
-                           'Night': {'entry_start': '18:00',
-                                     'exit end': '04:00',
-                                     'rates': {0: {'days': [1, 2, 3, 4],
-                                                   'prices': '$15.00',
+                           'Night': {'rates': {0: {'days': [1, 2, 3, 4],
+                                                   'entry_start': '18:00',
+                                                   'exit_end': '04:00',
+                                                   'prices': '15.00',
                                                    'rate_type': 'flat'},
-                                               1: {'days': 5,
-                                                   'prices': '$25.00',
+                                               1: {'days': [5],
+                                                   'entry_start': '18:00',
+                                                   'exit_end': '04:00',
+                                                   'prices': '25.00',
                                                    'rate_type': 'flat'},
-                                               2: {'days': 6,
-                                                   'prices': '$25.00',
+                                               2: {'days': [6],
+                                                   'entry_start': '18:00',
+                                                   'exit_end': '04:00',
+                                                   'prices': '25.00',
                                                    'rate_type': 'flat'},
-                                               3: {'days': 7,
-                                                   'prices': '$15.00',
-                                                   'rate_type': 'flat'}}},
-                           'Weekend': {}}
+                                               3: {'days': [7],
+                                                   'entry_start': '18:00',
+                                                   'exit_end': '04:00',
+                                                   'prices': '15.00',
+                                                   'rate_type': 'flat'}}}
+                           }
 
-        self.maxDiff = None
         self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
+
 
     def _get_prices_information_park_id_4(self):
         url = "https://www.wilsonparking.com.au/park/2024_175-Liverpool-St-Car-Park_26-Nithsdale-Street-Sydney"
@@ -474,3 +444,30 @@ class WilssonsRateParserMethodTest(TestCase):
             prices.append(RatePrice.objects.filter(rateID=rate).order_by('duration'))
 
         return prices
+
+    def _assert_saved_rates(self, carpark, expected_result):
+        # Check casual rates stored in DB
+        casual_prices = self._get_stored_prices(carpark, "Casual", "hourly", 0)
+
+        for price in casual_prices[0]:
+            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+
+        # Check early bird rates stored in DB
+        early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
+        for single_day_price in early_bird_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
+        for single_day_price in super_early_bird_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
+
+        # Check super early bird rates stored in DB
+        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
+        # for single_day_price in night_prices:
+        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
+
+        # Check weekend rates stored in DB
+        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
+        for single_day_price in weekend_prices:
+            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))
