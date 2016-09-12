@@ -12,7 +12,9 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        # self._get_prices_information_park_id_1()
+        print("Testing carparkID = 1")
+        self._get_prices_information_park_id_1()
+        print("Testing carparkID = 2")
         self._get_prices_information_park_id_2()
 
     def _get_prices_information_park_id_1(self):
@@ -158,7 +160,9 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'exit_start': '15:30',
                                                 'prices': '24.00',
                                                 'rate_type': 'flat'},
-                           'Weekend': {'days': [[6, 7]],
+                           'Weekend': {'days': [6, 7],
+                                       'entry_start': '00:00',
+                                       'exit_end': '23:59',
                                        'rate_type': 'flat',
                                        'notes': ['Flate rate per exit, per day'],
                                        'prices': '15.00'}}
