@@ -12,8 +12,8 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
-        self._get_prices_information_park_id_1()
-        # self._get_prices_information_park_id_2()
+        # self._get_prices_information_park_id_1()
+        self._get_prices_information_park_id_2()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -117,7 +117,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                          address="190-202 Clarence Street, Sydney",
                                          lat=-33.871420, long=151.203594, parking_type="Wilson", uri=url)
 
-        rates, html = self._get_rates(url)
+        rates, html = self._get_rates(carpark)
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
@@ -437,19 +437,18 @@ class WilssonsRateParserMethodTest(TestCase):
         #     self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
 
     def _get_rates(self, carpark: Parking):
-        for html_file in os.listdir(settings.HTML_CACHE_DIRECTORY):
-            if html_file == "carparkID_" + str(carpark.parkingID) + ".html":
-                rates_file = open(os.path.join(settings.HTML_CACHE_DIRECTORY, html_file), "r")
-                rates_html = rates_file.read()
-                rates_file.close()
+        html_file = os.path.join(settings.HTML_CACHE_DIRECTORY, "carparkID_" + str(carpark.parkingID) + ".html")
+        rates_file = open(html_file, "r")
+        rates_html = rates_file.read()
+        rates_file.close()
 
-                mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever",
-                                 fromlist=['RatesRetriever'])
-                RatesRetriever = getattr(mod, 'RatesRetriever')
-                # store it as string variable
-                parser = RatesRetriever()
-                rates = parser.get_rates(rates_html)
-                return rates, rates_html
+        mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever",
+                         fromlist=['RatesRetriever'])
+        RatesRetriever = getattr(mod, 'RatesRetriever')
+        # store it as string variable
+        parser = RatesRetriever()
+        rates = parser.get_rates(rates_html)
+        return rates, rates_html
 
     def _update_rates(selfs, carpark, html):
         mod = __import__("parker.classes.custom.wilson.rates_retriever",
