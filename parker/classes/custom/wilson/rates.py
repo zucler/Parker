@@ -108,9 +108,11 @@ class WilsonRates:
         Returns:
                 Returns list of all the days included in range
         """
-        try:
+        if Utils.string_found(" - ", days_range):
             self.__start_day, self.__end_day = days_range.split(" - ")
-        except Exception:
+        elif Utils.string_found(" & ", days_range):
+            self.__start_day, self.__end_day = days_range.split(" & ")
+        else:
             for day_list in self.DAYS_OF_WEEK:
                 for day in day_list:
                     if days_range.lower() == day.lower():

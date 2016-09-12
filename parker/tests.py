@@ -12,6 +12,7 @@ from parker.classes.core.utils import Utils
 class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
+
         print("Testing carparkID = 1")
         self._get_prices_information_park_id_1()
 
@@ -23,6 +24,15 @@ class WilssonsRateParserMethodTest(TestCase):
 
         print("Testing carparkID = 4")
         self._get_prices_information_park_id_4()
+
+        print("Testing carparkID = 5")
+        self._get_prices_information_park_id_5()
+
+        print("Testing carparkID = 6")
+        self._get_prices_information_park_id_6()
+
+        print("Testing carparkID = 7")
+        self._get_prices_information_park_id_7()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -315,16 +325,13 @@ class WilssonsRateParserMethodTest(TestCase):
                                          address="4 Defries Avenue, Zetland",
                                          lat=-33.905890, long=151.210313, parking_type="Wilson", uri=url)
 
-        rates, html = self._get_rates(url)
-        self.maxDiff = None
+        rates, html = self._get_rates(carpark)
+
         self.assertDictEqual(expected_result, rates)
 
         self._update_rates(carpark, html)
-        rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
-        prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
 
-        for price in prices:
-            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+        self._assert_saved_rates(carpark, expected_result)
 
     def _get_prices_information_park_id_6(self):
         """This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
@@ -357,16 +364,13 @@ class WilssonsRateParserMethodTest(TestCase):
                                          address="Cnr Herring & Waterloo Roads, North Ryde",
                                          lat=-33.776880, long=151.118162, parking_type="Wilson", uri=url)
 
-        rates, html = self._get_rates(url)
-        self.maxDiff = None
+        rates, html = self._get_rates(carpark)
+
         self.assertDictEqual(expected_result, rates)
 
         self._update_rates(carpark, html)
-        rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
-        prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
 
-        for price in prices:
-            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+        self._assert_saved_rates(carpark, expected_result)
 
     def _get_prices_information_park_id_7(self):
         expected_result = {'Casual': {'days': '',
@@ -378,13 +382,13 @@ class WilssonsRateParserMethodTest(TestCase):
                                       'prices': {
                                           30: "6.00",
                                           60: "15.00",
-                                          90: "25.00",
-                                          120: "25.00",
-                                          150: "30.00",
-                                          180: "30.00",
-                                          210: "34.00",
-                                          240: "34.00",
-                                          1440: "39.00"},
+                                          90: "26.00",
+                                          120: "26.00",
+                                          150: "31.00",
+                                          180: "31.00",
+                                          210: "35.00",
+                                          240: "35.00",
+                                          1440: "40.00"},
                                       'rate_type': 'hourly'},
                            'Night': {'notes': ['Special Events: $28.00'],
                                      'rates': {0: {'days': [1, 2, 3, 4, 5, 6, 7],
@@ -408,16 +412,13 @@ class WilssonsRateParserMethodTest(TestCase):
                                          address="169-179 Thomas Street Car Park",
                                          lat=-33.881828, long=151.2005398, parking_type="Wilson", uri=url)
 
-        rates, html = self._get_rates(url)
-        self.maxDiff = None
+        rates, html = self._get_rates(carpark)
+
         self.assertDictEqual(expected_result, rates)
 
-        # self._update_rates(carpark, html)
-        # rate = RateType.objects.get(parkingID=carpark, label="Casual", rate_type="hourly", day_of_week=0)
-        # prices = RatePrice.objects.filter(rateID=rate).order_by('duration')
-        #
-        # for price in prices:
-        #     self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
 
     def _get_rates(self, carpark: Parking):
         html_file = os.path.join(settings.HTML_CACHE_DIRECTORY, "carparkID_" + str(carpark.parkingID) + ".html")
