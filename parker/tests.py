@@ -34,6 +34,9 @@ class WilssonsRateParserMethodTest(TestCase):
         print("Testing carparkID = 7")
         self._get_prices_information_park_id_7()
 
+        print("Testing carparkID = 8")
+        self._get_prices_information_park_id_8()
+
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
 
@@ -231,7 +234,6 @@ class WilssonsRateParserMethodTest(TestCase):
 
         self._assert_saved_rates(carpark, expected_result)
 
-
     def _get_prices_information_park_id_4(self):
         url = "https://www.wilsonparking.com.au/park/2024_175-Liverpool-St-Car-Park_26-Nithsdale-Street-Sydney"
 
@@ -293,9 +295,6 @@ class WilssonsRateParserMethodTest(TestCase):
 
         self._assert_saved_rates(carpark, expected_result)
 
-    """ This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
-    """
-
     def _get_prices_information_park_id_5(self):
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
@@ -307,17 +306,11 @@ class WilssonsRateParserMethodTest(TestCase):
                                                  60: "0.00",
                                                  90: "0.00",
                                                  120: "0.00",
-                                                 150: "3.00",
-                                                 180: "7.00",
-                                                 210: "9.00",
-                                                 240: "11.00",
-                                                 270: "13.00",
-                                                 300: "15.00",
-                                                 330: "23.00",
-                                                 360: "23.00",
-                                                 390: "32.00",
-                                                 420: "32.00",
-                                                 1440: "42.00"},
+                                                 150: "5.00",
+                                                 180: "8.00",
+                                                 210: "12.00",
+                                                 240: "16.00",
+                                                 1440: "18.00"},
                                       'rate_type': 'hourly'},
                            }
         url = "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
@@ -334,8 +327,6 @@ class WilssonsRateParserMethodTest(TestCase):
         self._assert_saved_rates(carpark, expected_result)
 
     def _get_prices_information_park_id_6(self):
-        """This function validates the rates object generated as well as subsequently validates the rates saved and stored in DB
-        """
         expected_result = {'Casual': {'days': '',
                                       'entry_start': '00:00',
                                       'exit_end': '23:59',
@@ -409,6 +400,39 @@ class WilssonsRateParserMethodTest(TestCase):
                            }
         url = "https://www.wilsonparking.com.au/park/2108_169-179-Thomas-Street-Car-Park_169-179-Thomas-Street-Haymarket"
         carpark = Parking.objects.create(parkingID=7, label="169-179 Thomas Street Car Park",
+                                         address="169-179 Thomas Street Car Park",
+                                         lat=-33.881828, long=151.2005398, parking_type="Wilson", uri=url)
+
+        rates, html = self._get_rates(carpark)
+
+        self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
+
+    def _get_prices_information_park_id_8(self):
+        expected_result = {'Casual': {'days': '',
+                                      'entry_start': '00:00',
+                                      'exit_end': '23:59',
+                                      'notes': ['First 15 minutes free in open air car park (P9)',
+                                                'Rates are based on a 24 hour period',
+                                                'Each additional 24 hour period, or part thereof: $59.50 '
+                                                'per day'],
+                                      'prices': {
+                                          30: "8.00",
+                                          60: "17.00",
+                                          90: "25.00",
+                                          120: "25.00",
+                                          150: "33.00",
+                                          180: "33.00",
+                                          1440: "59.50",
+                                          2880: "119.00",
+                                          4320: "178.50"},
+                                      'rate_type': 'hourly'}
+                           }
+        url = "https://www.wilsonparking.com.au/park/2099_Sydney-Airport-International-Car-Park_Sydney-International-Airport-Station-Mascot"
+        carpark = Parking.objects.create(parkingID=8, label="169-179 Thomas Street Car Park",
                                          address="169-179 Thomas Street Car Park",
                                          lat=-33.881828, long=151.2005398, parking_type="Wilson", uri=url)
 
