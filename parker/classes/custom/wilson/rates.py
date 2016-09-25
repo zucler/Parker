@@ -24,6 +24,7 @@ class WilsonRates:
         self.rates_data = []
         self.processed_rates = dict()
         self.processed_lines = []
+        self.hourly_minutes = 0
 
     def set_section_data(self, section_data):
         self.rates_data = section_data
@@ -48,39 +49,44 @@ class WilsonRates:
 
     def _extract_hourly_rates(self):
         i = 0
-        current_hourly_minutes = 0
         for line in self.rates_data:
             if Utils.string_found('hrs', line) or Utils.string_found(' days', line):
                 if not i + 1 == len(self.rates_data):
                     next_line = self.rates_data[i + 1]
-                    prices_str = self._format_prices_line(next_line)
+                    price = self._format_prices_line(next_line)
 
                     if Utils.string_found(" - ", line):
                         time_str = self._format_time_line(line)
-                        hours_arr = time_str.split(" - ")
-                        if hours_arr[1] != "24.0":
-                            offset = float(hours_arr[1]) - float(hours_arr[0])
-                            current_hourly_minutes += 30
-                            self.processed_rates['prices'][current_hourly_minutes] = prices_str
-
-                            if offset > 0.5:
-                                number_of_repetitions = offset / 0.5
-                                for z in range(1, int(number_of_repetitions)):
-                                    current_hourly_minutes += 30
-                                    self.processed_rates['prices'][current_hourly_minutes] = prices_str
-                        else:
-                            self.processed_rates['prices'][self.MINUTES_IN_24_HOURS] = prices_str
+                        self._store_rates_for_hourly_rage(time_str, price)
                     elif Utils.string_found(" days", line):
-                            number_of_days = self._format_time_line(line)
-                            current_hourly_minutes = int(float(number_of_days) * self.MINUTES_IN_24_HOURS)
-                            self.processed_rates['prices'][current_hourly_minutes] = prices_str
+                        number_of_days = self._format_time_line(line)
+                        self._store_rates_for_daily_range(number_of_days, price)
                     elif Utils.string_found("+", line):
-                        self.processed_rates['prices'][self.MINUTES_IN_24_HOURS] = prices_str
+                        self._store_rates_for_daily_range(1, price)
 
                     self.processed_lines.append(line)
                     if next_line:
                         self.processed_lines.append(next_line)
             i += 1
+
+    def _store_rates_for_hourly_rage(self, time_str, price):
+        hours_arr = time_str.split(" - ")
+        if hours_arr[1] != "24.0":
+            offset = float(hours_arr[1]) - float(hours_arr[0])
+            self.hourly_minutes += 30
+            self.processed_rates['prices'][self.hourly_minutes] = price
+
+            if offset > 0.5:
+                number_of_repetitions = offset / 0.5
+                for z in range(1, int(number_of_repetitions)):
+                    self.hourly_minutes += 30
+                    self.processed_rates['prices'][self.hourly_minutes] = price
+        else:
+            self.processed_rates['prices'][self.MINUTES_IN_24_HOURS] = price
+
+    def _store_rates_for_daily_range(self, number_of_days, price):
+        time_range_in_minutes = int(float(number_of_days) * self.MINUTES_IN_24_HOURS)
+        self.processed_rates['prices'][time_range_in_minutes] = price
 
     def is_a_day(self, string):
         """Detect if string is a day of week
