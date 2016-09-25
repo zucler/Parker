@@ -13,29 +13,32 @@ class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
 
-        print("Testing carparkID = 1")
-        self._get_prices_information_park_id_1()
+        # print("Testing carparkID = 1")
+        # self._get_prices_information_park_id_1()
+        #
+        # print("Testing carparkID = 2")
+        # self._get_prices_information_park_id_2()
+        #
+        # print("Testing carparkID = 3")
+        # self._get_prices_information_park_id_3()
+        #
+        # print("Testing carparkID = 4")
+        # self._get_prices_information_park_id_4()
+        #
+        # print("Testing carparkID = 5")
+        # self._get_prices_information_park_id_5()
+        #
+        # print("Testing carparkID = 6")
+        # self._get_prices_information_park_id_6()
+        #
+        # print("Testing carparkID = 7")
+        # self._get_prices_information_park_id_7()
+        #
+        # print("Testing carparkID = 8")
+        # self._get_prices_information_park_id_8()
 
-        print("Testing carparkID = 2")
-        self._get_prices_information_park_id_2()
-
-        print("Testing carparkID = 3")
-        self._get_prices_information_park_id_3()
-
-        print("Testing carparkID = 4")
-        self._get_prices_information_park_id_4()
-
-        print("Testing carparkID = 5")
-        self._get_prices_information_park_id_5()
-
-        print("Testing carparkID = 6")
-        self._get_prices_information_park_id_6()
-
-        print("Testing carparkID = 7")
-        self._get_prices_information_park_id_7()
-
-        print("Testing carparkID = 8")
-        self._get_prices_information_park_id_8()
+        print("Testing carparkID = 9")
+        self._get_prices_information_park_id_9()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -437,6 +440,52 @@ class WilssonsRateParserMethodTest(TestCase):
                                          lat=-33.881828, long=151.2005398, parking_type="Wilson", uri=url)
 
         rates, html = self._get_rates(carpark)
+
+        self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
+
+    def _get_prices_information_park_id_9(self):
+        url = "https://www.wilsonparking.com.au/park/4062_Eagle-Street-Pier-Car-Park_45-Eagle-Street-Brisbane"
+
+        carpark = Parking.objects.create(parkingID=9, label="Carpark 9",
+                                         address="Whatever",
+                                         lat=-27.468988, long=153.028419, parking_type="Wilson", uri=url)
+
+        rates, html = self._get_rates(carpark)
+        expected_result = {'Casual': {'days': '',
+                                      'entry_start': '00:00',
+                                      'exit_end': '23:59',
+                                      'prices': {30: '10.00',
+                                                 60: '23.00',
+                                                 90: '46.00',
+                                                 120: '46.00',
+                                                 150: '69.00',
+                                                 180: '69.00',
+                                                 210: '74.00',
+                                                 240: '74.00',
+                                                 270: '79.00',
+                                                 300: '79.00',
+                                                 330: '84.00',
+                                                 360: '84.00',
+                                                 1440: '89.00'},
+                                      'rate_type': 'hourly'},
+                           'Night': {'rates': {0: {'days': [1, 2, 3, 4, 5],
+                                                   'entry_start': '17:00',
+                                                   'exit_end': '06:00',
+                                                   'prices': '15.00',
+                                                   'rate_type': 'flat'}}},
+                           'Weekend': {'days': [6, 7],
+                                       'entry_start': '00:00',
+                                       'exit_end': '23:59',
+                                       'notes': ['RIVERFIRE 24/09/2016',
+                                                 '$20.00',
+                                                 'Flat rate per exit, per day.'],
+                                       'prices': '15.00',
+                                       'rate_type': 'flat'
+                                       }}
 
         self.assertDictEqual(expected_result, rates)
 
