@@ -6,6 +6,8 @@ from parker.classes.core.utils import Utils
 class WilsonRates:
     ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?"
 
+    MINUTES_IN_24_HOURS = 1440
+
     DAYS_OF_WEEK = [
         ["Mon", "Monday"],
         ["Tue", "Tuesday", "Tues"],
@@ -48,29 +50,36 @@ class WilsonRates:
         i = 0
         current_hourly_minutes = 0
         for line in self.rates_data:
-            if Utils.string_found('hrs', line):
+            if Utils.string_found('hrs', line) or Utils.string_found(' days', line):
                 if not i + 1 == len(self.rates_data):
                     next_line = self.rates_data[i + 1]
+                    prices_str = self._format_prices_line(next_line)
 
-                hours_str = self._format_hours_line(line)
-                prices_str = self._format_prices_line(next_line)
-
-                hours_arr = hours_str.split(" - ")
-                if len(hours_arr) == 2:
-                    offset = float(hours_arr[1]) - float(hours_arr[0])
-                    current_hourly_minutes += 30
-                    self.processed_rates['prices'][current_hourly_minutes] = prices_str
-
-                    if offset > 0.5:
-                        number_of_repetitions = offset / 0.5
-                        for z in range(1, int(number_of_repetitions)):
+                    if Utils.string_found(" - ", line):
+                        time_str = self._format_time_line(line)
+                        hours_arr = time_str.split(" - ")
+                        if hours_arr[1] != "24.0":
+                            offset = float(hours_arr[1]) - float(hours_arr[0])
                             current_hourly_minutes += 30
                             self.processed_rates['prices'][current_hourly_minutes] = prices_str
-                else:
-                    self.processed_rates['prices'][1440] = prices_str  # 1440 is 24 hours in minutes
 
-                self.processed_lines.append(line)
-                self.processed_lines.append(next_line)
+                            if offset > 0.5:
+                                number_of_repetitions = offset / 0.5
+                                for z in range(1, int(number_of_repetitions)):
+                                    current_hourly_minutes += 30
+                                    self.processed_rates['prices'][current_hourly_minutes] = prices_str
+                        else:
+                            self.processed_rates['prices'][self.MINUTES_IN_24_HOURS] = prices_str
+                    elif Utils.string_found(" days", line):
+                            number_of_days = self._format_time_line(line)
+                            current_hourly_minutes = int(float(number_of_days) * self.MINUTES_IN_24_HOURS)
+                            self.processed_rates['prices'][current_hourly_minutes] = prices_str
+                    elif Utils.string_found("+", line):
+                        self.processed_rates['prices'][self.MINUTES_IN_24_HOURS] = prices_str
+
+                    self.processed_lines.append(line)
+                    if next_line:
+                        self.processed_lines.append(next_line)
             i += 1
 
     def is_a_day(self, string):
@@ -145,13 +154,15 @@ class WilsonRates:
                 if self.__range_started and self.__end_day.lower() == day.lower():
                     return True
 
-    def _format_hours_line(self, line):
+    def _format_time_line(self, line):
         """Remove unnecessary bits from hours string
 
         Args:
                 line (str): Hours string
         """
-        return line[:-3].strip()
+        line = line.replace("hrs", "")
+        line = line.replace("days", "")
+        return line.strip()
 
     def _format_prices_line(self, line):
         """Remove unnecessary bits from prices string
