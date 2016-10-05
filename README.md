@@ -34,13 +34,13 @@ DATABASES = {
 }
 ```
 
-2. Run *scripts/downloadParkingRatesHTML.py* in order to download HTML cache for all known carparks.
+2. Run the following command in order to download HTML cache for all known carparks.
 
 ```
 python scripts/downloadParkingRatesHTML.py
 ```
 
-3. Run *scripts/loadParkingRates.py* to process and store the cached rates.
+3. Run the following command to process and store the cached rates.
 
 ```
 python scripts/loadParkingRates.py
