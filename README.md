@@ -18,7 +18,7 @@ pip install -r path/to/virtualenv_packages.txt
 
 ### Installing
 
-1. Update config by making changes in *parker/settings.py* file.
+Update config by making changes in *parker/settings.py* file.
 
 ```
 #Set your DB connection details below:
@@ -34,13 +34,13 @@ DATABASES = {
 }
 ```
 
-2. Run the following command in order to download HTML cache for all known carparks.
+Run the following command in order to download HTML cache for all known carparks.
 
 ```
 python scripts/downloadParkingRatesHTML.py
 ```
 
-3. Run the following command to process and store the cached rates.
+Run the following command to process and store the cached rates.
 
 ```
 python scripts/loadParkingRates.py
