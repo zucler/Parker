@@ -13,35 +13,35 @@ class WilssonsRateParserMethodTest(TestCase):
     def test_main_drill(self):
         self.maxDiff = None
 
-        # print("Testing carparkID = 1")
-        # self._get_prices_information_park_id_1()
-        #
-        # print("Testing carparkID = 2")
-        # self._get_prices_information_park_id_2()
-        #
-        # print("Testing carparkID = 3")
-        # self._get_prices_information_park_id_3()
-        #
-        # print("Testing carparkID = 4")
-        # self._get_prices_information_park_id_4()
-        #
-        # print("Testing carparkID = 5")
-        # self._get_prices_information_park_id_5()
-        #
-        # print("Testing carparkID = 6")
-        # self._get_prices_information_park_id_6()
-        #
-        # print("Testing carparkID = 7")
-        # self._get_prices_information_park_id_7()
-        #
-        # print("Testing carparkID = 8")
-        # self._get_prices_information_park_id_8()
-        #
-        # print("Testing carparkID = 9")
-        # self._get_prices_information_park_id_9()
+        print("Testing carparkID = 1")
+        self._get_prices_information_park_id_1()
 
-        print("Testing carparkID = 10")
-        self._get_prices_information_park_id_10()
+        print("Testing carparkID = 2")
+        self._get_prices_information_park_id_2()
+
+        print("Testing carparkID = 3")
+        self._get_prices_information_park_id_3()
+
+        print("Testing carparkID = 4")
+        self._get_prices_information_park_id_4()
+
+        print("Testing carparkID = 5")
+        self._get_prices_information_park_id_5()
+
+        print("Testing carparkID = 6")
+        self._get_prices_information_park_id_6()
+
+        print("Testing carparkID = 7")
+        self._get_prices_information_park_id_7()
+
+        print("Testing carparkID = 8")
+        self._get_prices_information_park_id_8()
+
+        print("Testing carparkID = 9")
+        self._get_prices_information_park_id_9()
+
+        # print("Testing carparkID = 10")
+        # self._get_prices_information_park_id_10()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
