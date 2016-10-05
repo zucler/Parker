@@ -62,7 +62,7 @@ DATABASES = {
         'NAME': 'parker',  # Or path to database file if using sqlite3.
         'USER': 'root',  # Not used with sqlite3.
         'PASSWORD': 'root',  # Not used with sqlite3.
-        'HOST': '/Applications/MAMP/tmp/mysql/mysql.sock',  # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -83,7 +83,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
-STATIC_ROOT = '/srv/prod/carparker/static'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = '/extras/'
 

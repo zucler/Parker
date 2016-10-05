@@ -2,36 +2,60 @@
 
 CarParker is a web based searching engine to facilitate drivers to quickly find a parking with acceptable rates. It crawls the web to build up an up-to-date database of parking rates which is then used to serve search results to end users.
 
-## Prerequisities
+## Getting started
 
-Set up a python virtualenv and install packages listed in **virtualenv_dependencies.txt**<br>
-Adjust settings file.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-```
-Some examples
-```
+### Prerequisities
 
-## Running the system
+Set up a python virtualenv and install packages listed in *vitualenv_packages.txt*
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+To make pip install all packages:
 
 ```
-Give the example
+pip install -r path/to/virtualenv_packages.txt
 ```
 
-And repeat
+### Installing
+
+1. Update config by making changes in *parker/settings.py* file.
 
 ```
-until finished
+#Set your DB connection details below:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'parker',  # Or path to database file if using sqlite3.
+        'USER': 'root',  # Not used with sqlite3.
+        'PASSWORD': 'root',  # Not used with sqlite3.
+        'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
+    }
+}
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+2. Run *scripts/downloadParkingRatesHTML.py* in order to download HTML cache for all known carparks.
+
+```
+python scripts/downloadParkingRatesHTML.py
+```
+
+3. Run *scripts/loadParkingRates.py* to process and store the cached rates.
+
+```
+python scripts/loadParkingRates.py
+```
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+Tests are located in *parker/tests.py*.
+
+The main test drill function is **test_main_drill()**. If working in TDD manner, comment out every carpark test except for the one you are currently adding the support to.
+
+To execute test run:
+```
+./manage.py test
+```
 
 ## Versioning
 
