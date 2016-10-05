@@ -35,6 +35,7 @@ class WilsonRates:
         self.processed_lines = []
 
     def _extract_times_from_line(self, line):
+        # TODO: Account for lines like: "Entry between 6am & 10am and exit before 7pm."
         times_list = line.split(",")
 
         entry_times = []
