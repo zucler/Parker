@@ -36,9 +36,12 @@ class WilssonsRateParserMethodTest(TestCase):
         #
         # print("Testing carparkID = 8")
         # self._get_prices_information_park_id_8()
+        #
+        # print("Testing carparkID = 9")
+        # self._get_prices_information_park_id_9()
 
-        print("Testing carparkID = 9")
-        self._get_prices_information_park_id_9()
+        print("Testing carparkID = 10")
+        self._get_prices_information_park_id_10()
 
     def _get_prices_information_park_id_1(self):
         url = "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
@@ -486,6 +489,44 @@ class WilssonsRateParserMethodTest(TestCase):
                                        'prices': '15.00',
                                        'rate_type': 'flat'
                                        }}
+
+        self.assertDictEqual(expected_result, rates)
+
+        self._update_rates(carpark, html)
+
+        self._assert_saved_rates(carpark, expected_result)
+
+    def _get_prices_information_park_id_10(self):
+        url = "https://www.wilsonparking.com.au/park/3296_425-Collins-Street_425-Collins-Street"
+
+        carpark = Parking.objects.create(parkingID=10, label="Carpark 10",
+                                         address="Whatever",
+                                         lat=-37.817492, long=144.958452, parking_type="Wilson", uri=url)
+
+        rates, html = self._get_rates(carpark)
+        expected_result = {'Casual': {'days': '',
+                                      'entry_start': '00:00',
+                                      'exit_end': '23:59',
+                                      'prices': {30: '20.00',
+                                                 60: '20.00',
+                                                 90: '42.00',
+                                                 120: '42.00',
+                                                 150: '62.00',
+                                                 180: '62.00',
+                                                 210: '65.00',
+                                                 240: '65.00',
+                                                 270: '70.00',
+                                                 300: '70.00'
+                                                 },
+                                      'rate_type': 'hourly'},
+                           'Early Bird': {'days': [1, 2, 3, 4, 5],
+                                          'entry_end': '10:00',
+                                          'entry_start': '06:00',
+                                          'exit_end': '19:00',
+                                          'exit_start': '10:00',
+                                          'prices': '27.00',
+                                          'rate_type': 'flat'}
+                           }
 
         self.assertDictEqual(expected_result, rates)
 
