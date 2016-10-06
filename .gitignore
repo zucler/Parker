@@ -4,8 +4,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 parker/__pycache__/
-polls/__pycache__/
-
 *.py[cod]
 
 # C extensions
@@ -13,18 +11,6 @@ polls/__pycache__/
 
 # Distribution / packaging
 .Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -64,5 +50,12 @@ docs/_build/
 target/
 
 #ctp
-docs/ctp/
+/docs/ctp/
 __history/
+*.bat
+.sass-cache/
+/venv/
+!/static/script/lib
+
+#settings file
+parker/settings.py
