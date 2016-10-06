@@ -18,7 +18,7 @@ pip install -r path/to/virtualenv_packages.txt
 
 ### Installing
 
-Update config by making changes in *parker/settings.py* file.
+Rename _parker/settings.default.py_ to _parker/settings.py_ and update the database settings:
 
 ```
 #Set your DB connection details below:
