@@ -123,7 +123,7 @@ class RatesSection(WilsonRates):
         if Utils.string_found("entry", line.lower()):
             if self._is_title_in_line(line, titles_list):
                 return True
-            elif self._is_single_rate_parking():
+            elif self._is_single_rate_parking() and dict_key in self.SECTIONS_DICTIONARY["Early Bird"]:
                 return True
 
         return False
@@ -136,7 +136,7 @@ class RatesSection(WilsonRates):
                     count += 1
                     break
 
-        if count == 1 or count == 0:  # Added this and exception for test purposes. Once confirmed that logic is working, both should be removed
+        if count == 1 or count == 0:
             return True
 
         if count > 1:
