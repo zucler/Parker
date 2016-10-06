@@ -60,4 +60,7 @@ __history/
 !/static/script/lib
 
 #rates html
-scripts/carparks_rates_html/*.html
+scripts/carparks_rates_html/
+
+#settings file
+parker/settings.py
