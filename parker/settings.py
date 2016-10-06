@@ -123,6 +123,7 @@ REST_FRAMEWORK = {
 STATIC_PRECOMPILER_OUTPUT_DIR = "compiled"
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.SCSS', {
+        #"executable": "/opt/aws/bin/sass",
         "executable": "/usr/local/bin/sass",
         "sourcemap_enabled": True,
         "compass_enabled": True,
