@@ -181,7 +181,7 @@ class WillsonsRates(Rates):
                             current_hourly_minutes += 30
                             prices[current_hourly_minutes] = prices_str
                     else:
-                        prices[str(current_hourly_minutes) + "+"] = prices_str
+                        prices[1440] = prices_str  # 1440 is 24 hours in minutes
 
             # Process flat price section
             if self.types[section_name]['type'] == "Flat":
@@ -215,6 +215,8 @@ class WillsonsRates(Rates):
         while not result or iteration == max_iterations:
             result = self._loop_through_days()
             ++iteration
+
+        self.__list_of_days.sort()
         return self.__list_of_days
 
     def _loop_through_days(self):
@@ -223,7 +225,7 @@ class WillsonsRates(Rates):
                 self.__range_started = True
 
             if self.__range_started:
-                self.__list_of_days += [day]
+                self.__list_of_days.append(Utils.day_string_to_digit(day))
 
             if self.__range_started and self.__end_date == day:
                 return True
