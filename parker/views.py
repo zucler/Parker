@@ -45,13 +45,13 @@ class ParkingViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'], url_path='parkings')
     def find_parkings_by_latlong(self, request: HttpRequest, pk=None):
         getdict = request.GET
-        minlat = getdict.get("minlat", None)
-        maxlat = getdict.get("maxlat", None)
-        minlong = getdict.get("minlong", None)
-        maxlong = getdict.get("maxlong", None)
+        s = getdict.get("s", None)
+        w = getdict.get("w", None)
+        n = getdict.get("n", None)
+        e = getdict.get("e", None)
 
         try:
-            geosearch = geo_search_all_models(minlat, maxlat, minlong, maxlong)
+            geosearch = geo_search_all_models(s, w, n, e)
         except ValueError:
             raise
 
