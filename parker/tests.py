@@ -47,10 +47,10 @@ class WilssonsRateParserMethodTest(TestCase):
                                                      1440: '35.00'},
                                           'rate_type': 'hourly'},
                                'Early Bird': {'days': [1, 2, 3, 4, 5],
-                                              'entry_start': '06:00',
-                                              'entry_end': '09:30',
-                                              'exit_start': '15:00',
-                                              'exit_end': '17:00',
+                                              'entry end': '09:30',
+                                              'entry start': '06:00',
+                                              'exit end': '19:00',
+                                              'exit start': '15:00',
                                               'notes': ['Have ticket validated by machine on '
                                                         'Level 3 in the morning, proceed to '
                                                         'Level 1 or 2 for parking'],
