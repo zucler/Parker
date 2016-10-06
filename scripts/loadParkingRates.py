@@ -2,6 +2,7 @@ __author__ = 'Maxim Pak'
 
 import os
 import sys
+import pprint
 from contextlib import closing
 
 from selenium.webdriver import Firefox
@@ -12,8 +13,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 import parker.wsgi
 from parker.models import Parking, RateType, RatePrice
 from parker.parser import WillsonsRatesParser
+from parker.classes.utils import Utils
 
 carparkings = Parking.objects.all()
+#carparkings = Parking.objects.filter(parkingID=1)
 for carpark in carparkings:
     url = carpark.uri
     # use firefox to get page with javascript generated content
@@ -25,13 +28,15 @@ for carpark in carparkings:
         # store it as string variable
         parser = WillsonsRatesParser()
         rates = parser.get_prices_information(browser.page_source)
+        # Utils.pprint(rates.types)
+        # exit()
         # save rates into DB
         for rate_name, rate_data in rates.types.items():
             if rate_data['type'] == "Flat":
                 for day_of_week in rate_data['days_range']:
                     save_carpark_rate = False
                     carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_name,
-                                                                           type=rate_data['type'],
+                                                                           rate_type=rate_data['type'],
                                                                            day_of_week=day_of_week)
 
                     if carpark_rate.start_time != rate_data['start']:
@@ -51,8 +56,8 @@ for carpark in carparkings:
                         carpark_rate_price.save()
             elif rate_data['type'] == "Hourly":
                 carpark_rate, created = RateType.objects.get_or_create(parkingID=carpark, label=rate_name,
-                                                                       type=rate_data['type'],
-                                                                       day_of_week="")
+                                                                       rate_type=rate_data['type'],
+                                                                       day_of_week=0)
 
                 save_carpark_rate = False
                 if carpark_rate.start_time != rate_data['start']:
