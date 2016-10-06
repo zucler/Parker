@@ -32,7 +32,6 @@ class RateType(models.Model):
     """
     parkingID = models.ForeignKey(Parking, on_delete=models.CASCADE, db_column='parkingID')
     rateID = models.AutoField(primary_key=True, unique=True)
-
     day_of_week = models.SmallIntegerField(default=0)
     start_time = models.TimeField(default=time(0, 0, 0))
     end_time = models.TimeField(default=time(0, 0, 0))

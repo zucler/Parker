@@ -22,7 +22,7 @@ Create a new file _parker/settings.py_.
 
 Copy the contents from _parker/settings.default.py_ into the new file.
 
-Update the settings:
+Update the settings in new file to match your setup:
 
 ```
 #Set your DB connection details below:
