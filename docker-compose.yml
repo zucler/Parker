@@ -1,19 +1,17 @@
- version: '2'
- services:
-   parker:
-     build: .
-     working_dir: /carparker
-     #command: "/carparker/bootstrap.sh"
-     volumes:
-       - .:/carparker
-     ports:
-       - "8000:8000"
-     tty: true
-     depends_on:
-       - nginx
-   nginx:
-     build: ./nginx
-     #volumes:
-    #   - .:/carparker
-     ports:
-       - "80:80"
+version: '2'
+services:
+    parker:
+        build: ./container-app
+        working_dir: /carparker
+        command: "/carparker/container-app/bootstrap.sh"
+        volumes:
+            - .:/carparker
+        #ports:
+        #  - "8030:8030"
+        tty: true
+    nginx:
+        build: ./container-nginx
+        ports:
+            - "80:80"
+        volumes:
+            - .:/carparker 
