@@ -9,7 +9,7 @@ import parker.wsgi
 from parker.models import Parking, RateType, RatePrice
 from django.conf import settings
 
-sys.path.append('/srv/prod/carparker')
+sys.path.append('/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 carparkings = Parking.objects.all()
