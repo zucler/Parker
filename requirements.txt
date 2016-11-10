@@ -1,0 +1,9 @@
+beautifulsoup4
+Django
+django-debug-toolbar
+django-static-precompiler
+djangorestframework
+mysqlclient
+selenium
+sqlparse
+uWSGI
