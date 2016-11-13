@@ -13,6 +13,8 @@ services:
             - parker-db
     nginx:
         build: ./container-nginx
+        volumes:
+            - .:/carparker
         ports:
             - "80:80"
         depends_on:

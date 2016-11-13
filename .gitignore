@@ -59,3 +59,4 @@ __history/
 
 #settings file
 parker/settings.py
+static/admin
