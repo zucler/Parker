@@ -15,12 +15,18 @@ RUN apt-get update && apt-get install -y \
 	build-essential \
 	libssl-dev \
 	vim \
-    net-tools
+    net-tools \
+    ruby-full \
+    rubygems \
+    mysql-client \
+    netcat
+
+RUN gem install sass
   
 RUN apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Make 'python' command to point to python3
-#RUN alias python=python3
+RUN alias python=python3
 
 RUN easy_install3 pip
 
