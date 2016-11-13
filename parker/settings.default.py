@@ -22,7 +22,7 @@ SECRET_KEY = '+56vp3(=hfhqu-l5c$jn!308lv*)#^5#q)i7i37l8_o!t$jxmf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["ubuntu-linux.shared", "localhost"]
 
 # Application definition
 
