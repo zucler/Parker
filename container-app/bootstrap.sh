@@ -23,6 +23,9 @@ done
 # import mysql data
 find /carparker/db_dump/latest/ -name '*.sql' | awk '{ print "source",$0 }' | mysql --batch -hparker-db -uroot -proot parker 
 
+# Syncing Django admin page css that is stored in python package with local app static directory
+rsync -rt /usr/local/lib/python3.5/dist-packages/django/contrib/admin/static/admin/ /carparker/static/admin/
+
 # Start supervisord process
 supervisord -n 
 
