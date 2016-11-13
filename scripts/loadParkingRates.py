@@ -1,12 +1,13 @@
 import os
 import sys
 
+sys.path.append('/carparker')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
+
 import parker.wsgi
 from parker.models import Parking, RateType, RatePrice
 from django.conf import settings
 
-sys.path.append('/srv/prod/carparker')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 for html_file in os.listdir(settings.HTML_CACHE_DIRECTORY):
     if html_file.endswith(".html"):

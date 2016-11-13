@@ -5,12 +5,13 @@ from contextlib import closing
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 
+sys.path.append('/carparker')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
+
 import parker.wsgi
 from parker.models import Parking, RateType, RatePrice
 from django.conf import settings
 
-sys.path.append('/carparker')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 carparkings = Parking.objects.all()
 #carparkings = Parking.objects.filter(parkingID=7)
