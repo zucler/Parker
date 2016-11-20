@@ -26,6 +26,10 @@ find /carparker/db_dump/latest/ -name '*.sql' | awk '{ print "source",$0 }' | my
 # Syncing Django admin page css that is stored in python package with local app static directory
 rsync -rt /usr/local/lib/python3.5/dist-packages/django/contrib/admin/static/admin/ /carparker/static/admin/
 
+# Setting up phantomjs
+#tar -xjf /home/docker/phantomjs.tar.bz2 
+#ln -s /home/docker/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+
 # Start supervisord process
 supervisord -n 
 
