@@ -27,14 +27,14 @@ Start docker containers
 docker-compose up -d
 ```
 
-## Attaching to app container
+### Attaching to app container
 
 In order to run any commands and test your code, you need to be attached to the main app container. In order to do so, execute
 ```
 docker exec -i -t carparker_parker_1 /bin/bash
 ```
 
-## Downloading rates
+### Downloading rates
 
 Run the following command in order to download HTML cache for all known carparks.
 
@@ -48,7 +48,7 @@ Run the following command to process and store the cached rates.
 python3 scripts/loadParkingRates.py
 ```
 
-## Running the tests
+### Running the tests
 
 Tests are located in *parker/tests.py*.
 
@@ -59,7 +59,7 @@ To execute test run:
 python3 manage.py test
 ```
 
-## Backing up database
+### Backing up database
 If any changes has been made to the data in database, they need to be backed up manually in order to not get lost. It can be done by running a **backup_db.sh** script from the main app container.
 
 
