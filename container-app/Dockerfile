@@ -34,7 +34,7 @@ RUN cd /home/docker && tar -xjf phantomjs.tar.bz2 && ln -s /home/docker/phantomj
 RUN apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Make 'python' command to point to python3
-RUN alias python=python3
+#RUN alias python=python3
 
 RUN easy_install3 pip
 
