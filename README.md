@@ -59,6 +59,10 @@ To execute test run:
 python3 manage.py test
 ```
 
+## Backing up database
+If any changes has been made to the data in database, they need to be backed up manually in order to not get lost. It can be done by running a **backup_db.sh** script from the main app container.
+
+
 ## Versioning
 
 Used [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/zucler/Parker/tags).
