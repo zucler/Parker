@@ -8,13 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisities
 
-Set up a python virtualenv and install packages listed in *vitualenv_packages.txt*
-
-To make pip install all packages:
-
-```
-pip install -r path/to/virtualenv_packages.txt
-```
+You need to have _Docker Engine_ and _docker-compose_ installed.
 
 ### Installing
 
@@ -22,32 +16,36 @@ Create a new file _parker/settings.py_.
 
 Copy the contents from _parker/settings.default.py_ into the new file.
 
-Update the settings in new file to match your setup:
+Alternatively, on Unix/Linux systems you can simply create a symlink by running.
 
 ```
-#Set your DB connection details below:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'parker',  # Or path to database file if using sqlite3.
-        'USER': 'root',  # Not used with sqlite3.
-        'PASSWORD': 'root',  # Not used with sqlite3.
-        'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
-    }
-}
+ln -s parker/settings.default.py parker/settings.py
 ```
+
+Start docker containers
+```
+docker-compose up -d
+```
+
+## Attaching to app container
+
+In order to run any commands and test your code, you need to be attached to the main app container. In order to do so, execute
+```
+docker exec -i -t carparker_parker_1 /bin/bash
+```
+
+## Downloading rates
 
 Run the following command in order to download HTML cache for all known carparks.
 
 ```
-python scripts/downloadParkingRatesHTML.py
+python3 scripts/downloadParkingRatesHTML.py
 ```
 
 Run the following command to process and store the cached rates.
 
 ```
-python scripts/loadParkingRates.py
+python3 scripts/loadParkingRates.py
 ```
 
 ## Running the tests
@@ -58,7 +56,7 @@ The main test drill function is **test_main_drill()**. If working in TDD manner,
 
 To execute test run:
 ```
-./manage.py test
+python3 manage.py test
 ```
 
 ## Versioning
@@ -69,8 +67,6 @@ Used [SemVer](http://semver.org/) for versioning. For the versions available, se
 
 - **Maxim Pak** - _Initial idea & work_ - [zucler](https://github.com/zucler)
 - **Stepan Tsymbal** - _Greatest contributor_ - [ouvtk](https://github.com/ouvtk)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
