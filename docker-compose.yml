@@ -26,5 +26,3 @@ services:
         environment:
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_DATABASE=parker
-            - MYSQL_USER=carparker
-            - MYSQL_PASSWORD=carparker

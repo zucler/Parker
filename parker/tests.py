@@ -536,8 +536,9 @@ class WilssonsRateParserMethodTest(TestCase):
 
     def _get_rates(self, carpark: Parking):
         html_file = os.path.join(settings.HTML_CACHE_DIRECTORY, "carparkID_" + str(carpark.parkingID) + ".html")
-        rates_file = open(html_file, "r")
-        rates_html = rates_file.read()
+        rates_file = open(html_file, "rb")
+        rates_bytes = rates_file.read()
+        rates_html = rates_bytes.decode("utf-8")
         rates_file.close()
 
         mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever",

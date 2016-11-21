@@ -11,8 +11,9 @@ from django.conf import settings
 
 for html_file in os.listdir(settings.HTML_CACHE_DIRECTORY):
     if html_file.endswith(".html"):
-        rates_file = open(os.path.join(settings.HTML_CACHE_DIRECTORY, html_file), "r")
-        rates_html = rates_file.read()
+        rates_file = open(os.path.join(settings.HTML_CACHE_DIRECTORY, html_file), "rb")
+        rates_bytes = rates_file.read()
+        rates_html = rates_bytes.decode("utf-8")
         rates_file.close()
 
         carparkID = html_file[settings.HTML_FILE_PREFIX_LENGTH:-settings.HTML_FILE_SUFFIX_LENGTH]
