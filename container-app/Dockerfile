@@ -27,7 +27,7 @@ RUN gem install sass
 RUN gem install compass
 
 # Install phantomjs
-ADD https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 /home/docker/phantomjs.tar.bz2
+COPY packages/phantomjs.tar.bz2 /home/docker/phantomjs.tar.bz2
 
 RUN cd /home/docker && tar -xjf phantomjs.tar.bz2 && ln -s /home/docker/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 

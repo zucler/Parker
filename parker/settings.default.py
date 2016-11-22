@@ -39,7 +39,8 @@ INSTALLED_APPS = (
     'static_precompiler',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,7 +48,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
+
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '172.18.0.1',  # Max macOS
+    '172.19.0.1',  # Max Ubuntu
 )
 
 ROOT_URLCONF = 'parker.urls'
@@ -93,7 +99,6 @@ STATICFILES_FINDERS = (
     'static_precompiler.finders.StaticPrecompilerFinder',
 )
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -111,7 +116,6 @@ TEMPLATES = [
     },
 ]
 
-
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -123,14 +127,24 @@ REST_FRAMEWORK = {
 STATIC_PRECOMPILER_OUTPUT_DIR = "compiled"
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.SCSS', {
-        #"executable": "/home/ctepa/bin/sass",
         "executable": "/usr/local/bin/sass",
         "sourcemap_enabled": True,
         "compass_enabled": True,
         "load_paths": ["/path"]
     }),
- )
+)
 
 HTML_CACHE_DIRECTORY = os.path.join(BASE_DIR, "scripts/carparks_rates_html")
 HTML_FILE_PREFIX_LENGTH = 10  # carparkID_
 HTML_FILE_SUFFIX_LENGTH = 5  # .html
+
+# Reloading uwsgi when script file is modified
+import uwsgi
+from uwsgidecorators import timer
+from django.utils import autoreload
+
+
+@timer(3)
+def change_code_gracefull_reload(sig):
+    if autoreload.code_changed():
+        uwsgi.reload()
