@@ -47,6 +47,24 @@ class Utils:
         return False
 
     @staticmethod
+    def string_has_partial_match_in_list(array, search_subject):
+        """
+        Iterate through each element in the list and return True if it string found in list
+
+        Args:
+            array:
+            search_subject:
+
+        Returns:
+
+        """
+        for item in array:
+            if Utils.string_found(item, search_subject):
+                return True
+
+        return False
+
+    @staticmethod
     def convert_to_24h_format(time):
         """Convert HH:MM, HH or H 12 hours time into 24 HH:MM format
 
@@ -124,3 +142,19 @@ class Utils:
 
         price_string = price_string.replace("$", "")
         return price_string
+
+    @staticmethod
+    def is_number(s):
+        """ Check if string is a number or not
+
+        Args:
+            s (str):
+
+        Returns:
+
+        """
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False

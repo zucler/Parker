@@ -38,7 +38,35 @@ class WilsonsRateParserTest(TestCase):
             self._validate_casual(section_data)
 
     def _validate_early_bird(self, section_data):
-        some_stuff = ""
+        """
+            'Early Bird': {'days': [1, 2, 3, 4, 5],
+                                          'entry_end': '09:30',
+                                          'entry_start': '08:00',
+                                          'exit_end': '19:30',
+                                          'exit_start': '15:00',
+                                          'prices': '24.00',
+                                          'notes': ["Proceed to Level 7 and validate ticket in "
+                                                    'morning, park on Level 7'],
+                                          'rate_type': 'flat'},
+                           'Super Early Bird': {'days': [1, 2, 3, 4, 5],
+                                                'entry_end': '08:00',
+                                                'entry_start': '06:00',
+                                                'exit_end': '19:30',
+                                                'exit_start': '15:00',
+                                                'prices': '19.00',
+                                                'notes': ["Proceed to Level 7 and validate ticket in "
+                                                          'morning, park on Level 7'],
+                                                'rate_type': 'flat'},
+
+        Args:
+            section_data:
+
+        Returns:
+
+        """
+        for field_name in section_data:
+            if Utils.string_has_partial_match_in_list(["start", "end"], field_name):
+                self._validate_time(section_data[field_name])
 
     def _validate_night(self, section_data):
         some_stuff = ""
@@ -49,6 +77,22 @@ class WilsonsRateParserTest(TestCase):
     def _validate_casual(self, section_data):
         some_stuff = ""
 
+    def _validate_time(self, time_string):
+        """
+        Validates time string
+
+        Args:
+            time_string (str):
+
+        Returns:
+
+        """
+        time_array = time_string.split(":")
+
+        self.assertEquals(2, len(time_array))
+
+        self.assertTrue(Utils.is_number(time_array[0]))
+        self.assertTrue(Utils.is_number(time_array[1]))
 
     def no_test_main_drill(self):
         self.maxDiff = None
