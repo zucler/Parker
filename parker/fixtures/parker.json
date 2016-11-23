@@ -1,0 +1,132 @@
+[
+{
+    "model": "parker.parking",
+    "pk": 1,
+    "fields": {
+        "label": "Queen Victoria Building Car Park",
+        "address": "111 York Street, Sydney",
+        "lat": "-33.871109",
+        "long": "151.206243",
+        "parking_type": "Wilson",
+        "places_of_interest": "(Entertainment) STATE THEATRE\r\n(Family) Sydney Tower Eye\r\n(Shopping) Pitt st Mall",
+        "uri": "http://wilsonparking.com.au/park/2036_Queen-Victoria-Building-Car-Park_111-York-Street-Sydney"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 2,
+    "fields": {
+        "label": "St Martins Tower Car Park",
+        "address": "190-202 Clarence Street, Sydney",
+        "lat": "-33.871420",
+        "long": "151.203594",
+        "parking_type": "Wilson",
+        "places_of_interest": "(Entertainment) State Theatre\r\n(Landmarks) Cockle Bay Wharf\r\n(Public Institutions) Sydney Town Hall",
+        "uri": "https://www.wilsonparking.com.au/park/2135_St-Martins-Tower-Car-Park_190-202-Clarence-Street-Sydney"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 3,
+    "fields": {
+        "label": "Harbourside Car Park",
+        "address": "100 Murray Street, Pyrmont",
+        "lat": "-33.871290",
+        "long": "151.195385",
+        "parking_type": "Wilson",
+        "places_of_interest": "Harbourside Shopping Centre, Darling Harbour, IMAX, Madame Tussauds Sydney, Wild Life Sydney Zoo, The Star",
+        "uri": "https://www.wilsonparking.com.au/park/2047_Harbourside-Car-Park_100-Murray-Street-Pyrmont"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 4,
+    "fields": {
+        "label": "175 Liverpool St Car Park",
+        "address": "26 Nithsdale Street, Sydney\n26 Nithsdale Street, Sydney\n26 Nithsdale Street, Sydney\n26 Nithsdale Street, Sydney",
+        "lat": "-33.877853",
+        "long": "151.208100",
+        "parking_type": "Wilson",
+        "places_of_interest": "(Entertainment) Capitol Theatre",
+        "uri": "https://www.wilsonparking.com.au/park/2024_175-Liverpool-St-Car-Park_26-Nithsdale-Street-Sydney"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 5,
+    "fields": {
+        "label": "East Village Car Park",
+        "address": "4 Defries Avenue, Zetland",
+        "lat": "-33.905890",
+        "long": "151.210313",
+        "parking_type": "Wilson",
+        "places_of_interest": "",
+        "uri": "https://www.wilsonparking.com.au/park/2260_East-Village-Car-Park_4-Defries-Avenue-Zetland"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 6,
+    "fields": {
+        "label": "Macquarie Shopping Centre Car Park",
+        "address": "Cnr Herring & Waterloo Roads, North Ryde",
+        "lat": "-33.776880",
+        "long": "151.118162",
+        "parking_type": "Wilson",
+        "places_of_interest": "",
+        "uri": "https://www.wilsonparking.com.au/park/2219_Macquarie-Shopping-Centre-Car-Park_Cnr-Herring--Waterloo-Roads-North-Ryde-"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 7,
+    "fields": {
+        "label": "169-179 Thomas Street Car Park",
+        "address": "169-179 Thomas Street Car Park",
+        "lat": "-33.881828",
+        "long": "151.200540",
+        "parking_type": "Wilson",
+        "places_of_interest": "(Entertainment) Quantas Credit Arena, (Entertainment) Capitoal Theatre, (Education & Museums)\nPOWERHOUSE MUSEUM",
+        "uri": "https://www.wilsonparking.com.au/park/2108_169-179-Thomas-Street-Car-Park_169-179-Thomas-Street-Haymarket"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 8,
+    "fields": {
+        "label": "Sydney Airport International Car Park",
+        "address": "Sydney International Airport Station, Mascot",
+        "lat": "-33.939923",
+        "long": "151.173088",
+        "parking_type": "Wilson",
+        "places_of_interest": "",
+        "uri": "https://www.wilsonparking.com.au/park/2099_Sydney-Airport-International-Car-Park_Sydney-International-Airport-Station-Mascot"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 9,
+    "fields": {
+        "label": "Eagle Street Pier Car Park",
+        "address": "45 Eagle Street, Brisbane",
+        "lat": "-27.468988",
+        "long": "153.028419",
+        "parking_type": "Wilson",
+        "places_of_interest": "",
+        "uri": "https://www.wilsonparking.com.au/park/4062_Eagle-Street-Pier-Car-Park_45-Eagle-Street-Brisbane"
+    }
+},
+{
+    "model": "parker.parking",
+    "pk": 10,
+    "fields": {
+        "label": "425 Collins Street",
+        "address": "425 Collins Street",
+        "lat": "-37.817492",
+        "long": "144.958452",
+        "parking_type": "Wilson",
+        "places_of_interest": "",
+        "uri": "https://www.wilsonparking.com.au/park/3296_425-Collins-Street_425-Collins-Street"
+    }
+}
+]
