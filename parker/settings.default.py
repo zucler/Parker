@@ -139,12 +139,14 @@ HTML_FILE_PREFIX_LENGTH = 10  # carparkID_
 HTML_FILE_SUFFIX_LENGTH = 5  # .html
 
 # Reloading uwsgi when script file is modified
-import uwsgi
-from uwsgidecorators import timer
-from django.utils import autoreload
+try:
+    import uwsgi
+    from uwsgidecorators import timer
+    from django.utils import autoreload
 
-
-@timer(3)
-def change_code_gracefull_reload(sig):
-    if autoreload.code_changed():
-        uwsgi.reload()
+    @timer(3)
+    def change_code_gracefull_reload(sig):
+        if autoreload.code_changed():
+            uwsgi.reload()
+except ImportError:
+    placeholder = ''
