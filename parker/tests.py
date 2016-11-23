@@ -9,8 +9,19 @@ from parker.models import Parking, RateType, RatePrice
 from parker.classes.core.utils import Utils
 
 
-class WilssonsRateParserMethodTest(TestCase):
-    def test_main_drill(self):
+class WilsonsRateParserTest(TestCase):
+    fixtures = ['parker.json']
+
+    def test_main(self):
+        carparks = Parking.objects.all()
+
+        for carpark in carparks:
+            rates, html = self._get_rates(carpark)
+
+            Utils.pprint(rates)
+            print("\n")
+
+    def no_test_main_drill(self):
         self.maxDiff = None
 
         print("Testing carparkID = 1")
@@ -72,7 +83,8 @@ class WilssonsRateParserMethodTest(TestCase):
                                           'exit_end': '19:30',
                                           'exit_start': '15:00',
                                           'prices': '24.00',
-                                          'notes': ["Proceed to Level 7 and validate ticket"],
+                                          'notes': ["Proceed to Level 7 and validate ticket in "
+                                                    'morning, park on Level 7'],
                                           'rate_type': 'flat'},
                            'Super Early Bird': {'days': [1, 2, 3, 4, 5],
                                                 'entry_end': '08:00',
@@ -80,7 +92,8 @@ class WilssonsRateParserMethodTest(TestCase):
                                                 'exit_end': '19:30',
                                                 'exit_start': '15:00',
                                                 'prices': '19.00',
-                                                'notes': ["Proceed to Level 7 and validate ticket"],
+                                                'notes': ["Proceed to Level 7 and validate ticket in "
+                                                          'morning, park on Level 7'],
                                                 'rate_type': 'flat'},
                            'Night': {'rates': {0: {'days': [1, 2, 3, 7],
                                                    'entry_start': '17:00',
@@ -132,8 +145,6 @@ class WilssonsRateParserMethodTest(TestCase):
                                                  120: '54.00',
                                                  150: '65.00',
                                                  180: '65.00',
-                                                 210: '74.00',
-                                                 240: '74.00',
                                                  1440: '78.00'},
                                       'rate_type': 'hourly'},
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
@@ -200,7 +211,7 @@ class WilssonsRateParserMethodTest(TestCase):
                                                  120: '26.00',
                                                  150: '30.00',
                                                  180: '30.00',
-                                                 1440: '36.00'},
+                                                 1440: '38.00'},
                                       'rate_type': 'hourly'},
                            'Early Bird': {'days': [1, 2, 3, 4, 5],
                                           'entry_end': '09:30',
