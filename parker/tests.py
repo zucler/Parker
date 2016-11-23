@@ -16,10 +16,39 @@ class WilsonsRateParserTest(TestCase):
         carparks = Parking.objects.all()
 
         for carpark in carparks:
-            rates, html = self._get_rates(carpark)
+            carpark_rates, html = self._get_rates(carpark)
 
-            Utils.pprint(rates)
-            print("\n")
+            for section_name in carpark_rates:
+                self._validate_section(section_name, carpark_rates[section_name])
+
+    def _validate_section(self, section_name, section_data):
+        if section_name == 'Early Bird':
+            self._validate_early_bird(section_data)
+
+        if section_name == 'Super Early Bird':
+            self._validate_early_bird(section_data)
+
+        if section_name == 'Night':
+            self._validate_night(section_data)
+
+        if section_name == 'Weekend':
+            self._validate_weekend(section_data)
+
+        if section_name == 'Casual':
+            self._validate_casual(section_data)
+
+    def _validate_early_bird(self, section_data):
+        some_stuff = ""
+
+    def _validate_night(self, section_data):
+        some_stuff = ""
+
+    def _validate_weekend(self, section_data):
+        some_stuff = ""
+
+    def _validate_casual(self, section_data):
+        some_stuff = ""
+
 
     def no_test_main_drill(self):
         self.maxDiff = None
