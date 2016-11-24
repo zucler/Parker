@@ -38,55 +38,80 @@ class WilsonsRateParserTest(TestCase):
             self._validate_casual(section_data)
 
     def _validate_early_bird(self, section_data):
-        """
-            'Early Bird': {'days': [1, 2, 3, 4, 5],
-                                          'entry_end': '09:30',
-                                          'entry_start': '08:00',
-                                          'exit_end': '19:30',
-                                          'exit_start': '15:00',
-                                          'prices': '24.00',
-                                          'notes': ["Proceed to Level 7 and validate ticket in "
-                                                    'morning, park on Level 7'],
-                                          'rate_type': 'flat'},
-                           'Super Early Bird': {'days': [1, 2, 3, 4, 5],
-                                                'entry_end': '08:00',
-                                                'entry_start': '06:00',
-                                                'exit_end': '19:30',
-                                                'exit_start': '15:00',
-                                                'prices': '19.00',
-                                                'notes': ["Proceed to Level 7 and validate ticket in "
-                                                          'morning, park on Level 7'],
-                                                'rate_type': 'flat'},
-
-        Args:
-            section_data:
-
-        Returns:
-
-        """
         for field_name in section_data:
             if Utils.string_has_partial_match_in_list(["start", "end"], field_name):
                 self._validate_time(section_data[field_name])
 
+            if field_name == "prices":
+                self._validate_price(section_data[field_name])
+
+            if field_name == "rate_type":
+                self.assertEqual(section_data[field_name], "flat")
+
+            if field_name == "days":
+                self._validate_days(section_data[field_name])
+
     def _validate_night(self, section_data):
-        some_stuff = ""
+        for rate in section_data['rates']:
+            rate_data = section_data['rates'][rate]
+            for field_name in rate_data:
+                if Utils.string_has_partial_match_in_list(["start", "end"], field_name):
+                    self._validate_time(rate_data[field_name])
+
+                if field_name == "prices":
+                    self._validate_price(rate_data[field_name])
+
+                if field_name == "rate_type":
+                    self.assertEqual(rate_data[field_name], "flat")
+
+                if field_name == "days":
+                    self._validate_days(rate_data[field_name])
 
     def _validate_weekend(self, section_data):
-        some_stuff = ""
+        for field_name in section_data:
+            if Utils.string_has_partial_match_in_list(["start", "end"], field_name):
+                self._validate_time(section_data[field_name])
+
+            if field_name == "prices":
+                if section_data["rate_type"] == "hourly":
+                    for time_range in section_data["prices"]:
+                        self._validate_price(section_data["prices"][time_range])
+                else:
+                    self._validate_price(section_data[field_name])
+
+            if field_name == "rate_type":
+                if section_data[field_name] != "flat" and section_data[field_name] != "hourly":
+                    raise Exception("Invalid rate type")
+
+            if field_name == "days":
+                self._validate_days(section_data[field_name])
 
     def _validate_casual(self, section_data):
-        some_stuff = ""
+        for field_name in section_data:
+            if Utils.string_has_partial_match_in_list(["start", "end"], field_name):
+                self._validate_time(section_data[field_name])
+
+            if field_name == "prices":
+                for time_range in section_data["prices"]:
+                    self._validate_price(section_data["prices"][time_range])
+
+            if field_name == "rate_type":
+                self.assertEqual(section_data[field_name], "hourly")
+
+            if field_name == "days":
+                self.assertEqual("", section_data[field_name])
+
+    def _validate_days(self, days):
+        if type(days) is not list:
+            raise Exception("Invalid days type")
+
+        for day in days:
+            self.assertTrue(Utils.is_number(day))
+
+    def _validate_price(self, price_string):
+        self.assertTrue(Utils.is_number(price_string))
 
     def _validate_time(self, time_string):
-        """
-        Validates time string
-
-        Args:
-            time_string (str):
-
-        Returns:
-
-        """
         time_array = time_string.split(":")
 
         self.assertEquals(2, len(time_array))
