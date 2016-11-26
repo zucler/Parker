@@ -19,7 +19,7 @@ Copy the contents from _parker/settings.default.py_ into the new file.
 Alternatively, on Unix/Linux systems you can simply create a symlink by running.
 
 ```
-ln -s parker/settings.default.py parker/settings.py
+ln -s parker/settings/default.py parker/settings.py
 ```
 
 Start docker containers
@@ -56,7 +56,7 @@ The main test drill function is **test_main_drill()**. If working in TDD manner,
 
 To execute test run:
 ```
-python3 manage.py test
+python3 manage.py test --settings parker.settings.test
 ```
 
 ### Backing up database

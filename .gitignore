@@ -59,4 +59,5 @@ __history/
 
 #settings file
 parker/settings.py
+parker/tmp.txt
 static/admin

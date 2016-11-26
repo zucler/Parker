@@ -1,6 +1,4 @@
-__author__ = 'mpak'
 import os
-from decimal import *
 
 from django.test import TestCase
 from django.conf import settings
@@ -92,51 +90,3 @@ class WilsonsRateParserTest(TestCase):
         parser = RatesRetriever()
         rates = parser.get_rates(rates_html)
         return rates, rates_html
-
-    def _update_rates(selfs, carpark, html):
-        mod = __import__("parker.classes.custom.wilson.rates_retriever",
-                         fromlist=['RatesRetriever'])
-
-        RatesRetriever = getattr(mod, 'RatesRetriever')
-        parser = RatesRetriever()
-        parser.update_rates(carpark, html)
-
-    def _get_stored_prices(self, carpark, rate_label, rate_type, day_of_week=-1):
-        # rates are QuerySets
-        rates = RateType.objects.filter(parkingID=carpark, label=rate_label, rate_type=rate_type)
-
-        if day_of_week > -1:
-            rates = rates.filter(day_of_week=day_of_week)
-
-        prices = []
-        for rate in rates:
-            prices.append(RatePrice.objects.filter(rateID=rate).order_by('duration'))
-
-        return prices
-
-    def _assert_saved_rates(self, carpark, expected_result):
-        # Check casual rates stored in DB
-        casual_prices = self._get_stored_prices(carpark, "Casual", "hourly", 0)
-
-        for price in casual_prices[0]:
-            self.assertEquals(price.price, Decimal(expected_result['Casual']['prices'][price.duration]))
-
-        # Check early bird rates stored in DB
-        early_bird_prices = self._get_stored_prices(carpark, "Early Bird", "flat")
-        for single_day_price in early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        super_early_bird_prices = self._get_stored_prices(carpark, "Super Early Bird", "flat")
-        for single_day_price in super_early_bird_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Super Early Bird']['prices']))
-
-        # Check super early bird rates stored in DB
-        # night_prices = self._get_stored_prices(carpark, "Night", "flat")
-        # for single_day_price in night_prices:
-        #     self.assertEquals(single_day_price[0].price, Decimal(expected_result['Night']['rates']['prices'][0]))
-
-        # Check weekend rates stored in DB
-        weekend_prices = self._get_stored_prices(carpark, "Weekend", "flat")
-        for single_day_price in weekend_prices:
-            self.assertEquals(single_day_price[0].price, Decimal(expected_result['Weekend']['prices']))

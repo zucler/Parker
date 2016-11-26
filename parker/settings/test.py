@@ -20,7 +20,8 @@ BASE_DIR = "/carparker"
 SECRET_KEY = '+56vp3(=hfhqu-l5c$jn!308lv*)#^5#q)i7i37l8_o!t$jxmf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = ["ubuntu-linux.shared", "localhost"]
 
@@ -37,8 +38,20 @@ INSTALLED_APPS = (
     'parker',
     'rest_framework',
     'static_precompiler',
+    'django_nose'
 )
 
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=parker',
+]
+
+
+"""
 MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,6 +61,12 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+"""
+
+# Speed up password encryption
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
 INTERNAL_IPS = (
@@ -65,12 +84,7 @@ WSGI_APPLICATION = 'parker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'parker',  # Or path to database file if using sqlite3.
-        'USER': 'root',  # Not used with sqlite3.
-        'PASSWORD': 'root',  # Not used with sqlite3.
-        'HOST': 'parker-db',  # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3306',  # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
     }
 }
 
@@ -137,16 +151,3 @@ STATIC_PRECOMPILER_COMPILERS = (
 HTML_CACHE_DIRECTORY = os.path.join(BASE_DIR, "scripts/carparks_rates_html")
 HTML_FILE_PREFIX_LENGTH = 10  # carparkID_
 HTML_FILE_SUFFIX_LENGTH = 5  # .html
-
-# Reloading uwsgi when script file is modified
-try:
-    import uwsgi
-    from uwsgidecorators import timer
-    from django.utils import autoreload
-
-    @timer(3)
-    def change_code_gracefull_reload(sig):
-        if autoreload.code_changed():
-            uwsgi.reload()
-except ImportError:
-    placeholder = ''
