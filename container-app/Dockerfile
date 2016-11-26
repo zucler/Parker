@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
     mysql-client \
     netcat \
     fontconfig \
-    curl
+    curl \
+    sqlite3
 
 # Install SASS 
 RUN gem install sass

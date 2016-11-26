@@ -7,3 +7,5 @@ mysqlclient
 selenium
 sqlparse
 uWSGI
+coverage
+django-nose
