@@ -5,9 +5,10 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from parker.routers import CustomReadOnlyRouter
-from parker.views import ParkingViewSet
 
-from . import views
+from parker.views import common as views
+from parker.views.common import ParkingViewSet
+
 
 router = CustomReadOnlyRouter()
 router.register(prefix='api', viewset=ParkingViewSet, base_name='model')
