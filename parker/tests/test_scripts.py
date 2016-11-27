@@ -3,7 +3,7 @@ import os
 from django.test import TestCase
 from django.conf import settings
 
-from parker.models import Parking, RateType, RatePrice
+from parker.models.common import Parking, RateType, RatePrice
 from parker.classes.core.utils import Utils
 
 

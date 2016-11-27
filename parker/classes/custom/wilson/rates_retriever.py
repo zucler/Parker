@@ -3,7 +3,7 @@
 from parker.classes.core.parser import CoreParser
 from parker.classes.core.utils import Utils
 from parker.classes.custom.wilson.rates import WilsonRates
-from parker.models import Parking, RateType, RatePrice
+from parker.models.common import Parking, RateType, RatePrice
 
 
 class RatesRetriever(CoreParser):

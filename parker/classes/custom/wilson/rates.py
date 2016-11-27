@@ -31,7 +31,12 @@ class WilsonRates:
 
     def _unset_processed_lines(self):
         for line_to_remove in self.processed_lines:
-            self.rates_data.remove(line_to_remove)
+            try:
+                self.rates_data.remove(line_to_remove)
+            except ValueError:
+                Utils.pprint("Following line does not exist in the list: ")
+                Utils.pprint(line_to_remove)
+                exit("Error while processing rates")
         self.processed_lines = []
 
     def _extract_times_from_line(self, line):
