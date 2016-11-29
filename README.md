@@ -50,13 +50,11 @@ python3 scripts/loadParkingRates.py
 
 ### Running the tests
 
-Tests are located in *parker/tests.py*.
-
-The main test drill function is **test_main_drill()**. If working in TDD manner, comment out every carpark test except for the one you are currently adding the support to.
+Tests are located in *parker/tests/*.py*.
 
 To execute test run:
 ```
-python3 manage.py test --settings parker.settings.test
+./runtests.sh
 ```
 
 ### Backing up database
