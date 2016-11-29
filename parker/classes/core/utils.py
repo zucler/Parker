@@ -1,7 +1,9 @@
-__author__ = 'Maxim Pak'
-import pprint
+import os
 import re
+import pprint
 from datetime import datetime
+from parker.models.common import Parking
+from django.conf import settings
 
 
 class Utils:
@@ -121,11 +123,11 @@ class Utils:
         return False
 
     @staticmethod
-    def generate_end_html_tag(start_tag):
+    def generate_end_html_tag(start_tag: str):
         """ Generates end tag based on the start tag
 
         Args:
-            start_tag (string): Opening HTML tag
+            start_tag: Opening HTML tag
 
         Returns:
             Returns closing HTML tag
@@ -163,3 +165,28 @@ class Utils:
             return True
         except ValueError:
             return False
+
+    @staticmethod
+    def get_rates(carpark: Parking):
+        """
+        Retrieve car park rates from cached HTML
+
+        Args:
+            carpark: car park that rates to be returned for
+
+        Returns:
+            rates (dict): dictionary of car park rates
+        """
+        html_file = os.path.join(settings.HTML_CACHE_DIRECTORY, "carparkID_" + str(carpark.parkingID) + ".html")
+        rates_file = open(html_file, "rb")
+        rates_bytes = rates_file.read()
+        rates_html = rates_bytes.decode("utf-8")
+        rates_file.close()
+
+        mod = __import__("parker.classes.custom." + carpark.parking_type.lower() + ".rates_retriever",
+                         fromlist=['RatesRetriever'])
+        rates_retriever_cls = getattr(mod, 'RatesRetriever')
+        # store it as string variable
+        parser = rates_retriever_cls()
+        rates = parser.get_rates(rates_html)
+        return rates

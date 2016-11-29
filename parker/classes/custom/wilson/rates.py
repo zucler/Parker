@@ -19,7 +19,7 @@ class WilsonRates:
     ]
 
     def __init__(self):
-        """Initialize Willsons Parking rates object."""
+        """Initialize Wilson Parking rates object."""
         self.parking_type = "Wilson"
         self.rates_data = []
         self.processed_rates = dict()
@@ -52,8 +52,7 @@ class WilsonRates:
 
         return {"entry": entry_times, "exit": exit_times}
 
-    @staticmethod
-    def __split_times_string_into_list(time_str: str):
+    def __split_times_string_into_list(self, time_str: str):
         split_characters = [",", "and"]
 
         for split_char in split_characters:
