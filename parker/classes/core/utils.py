@@ -78,6 +78,11 @@ class Utils:
         hours_only_12_format = "%I%p"
         hours_minutes_24_format = "%H:%M"
 
+        # TODO: REFACTOR ASAP
+        if time == "midnight" or time == "exit before car park closes":
+            time = datetime.strptime("00:00", hours_minutes_24_format).strftime(hours_minutes_24_format)
+            return time
+
         try:
             time = datetime.strptime(time, hours_minutes_12_format).strftime(hours_minutes_24_format)
         except ValueError:

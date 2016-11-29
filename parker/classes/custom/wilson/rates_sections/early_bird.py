@@ -106,7 +106,10 @@ class RatesSection(WilsonRates):
                 self.processed_rates[dict_key]["entry_start"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][0]))
                 self.processed_rates[dict_key]["entry_end"] = Utils.convert_to_24h_format(":".join(times_dict['entry'][1]))
                 self.processed_rates[dict_key]["exit_start"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][0]))
-                self.processed_rates[dict_key]["exit_end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
+
+                # TODO: REFACTOR ASAP
+                if len(times_dict["exit"]) == 2:
+                    self.processed_rates[dict_key]["exit_end"] = Utils.convert_to_24h_format(":".join(times_dict['exit'][1]))
 
             i += 1
 

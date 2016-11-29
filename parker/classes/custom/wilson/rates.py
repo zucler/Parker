@@ -4,7 +4,7 @@ from parker.classes.core.utils import Utils
 
 
 class WilsonRates:
-    ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?"
+    ENTRY_EXIT_TIMES_REGEX = "([0-9]{1,2}[pam]{0,2})(?:\:)?([0-9]{1,2}[pam]{0,2})?|(midnight)|(exit before car park closes)"
 
     MINUTES_IN_24_HOURS = 1440
 
@@ -40,8 +40,7 @@ class WilsonRates:
         self.processed_lines = []
 
     def _extract_times_from_line(self, line):
-        # TODO: Account for lines like: "Entry between 6am & 10am and exit before 7pm."
-        times_list = line.split(",")
+        times_list = self.__split_times_string_into_list(line)
 
         entry_times = []
         for entry_list in re.compile(self.ENTRY_EXIT_TIMES_REGEX).findall(times_list[0]):
@@ -52,6 +51,18 @@ class WilsonRates:
             exit_times.append(list(filter(None, exit_list)))  # Filtering out empty strings
 
         return {"entry": entry_times, "exit": exit_times}
+
+    @staticmethod
+    def __split_times_string_into_list(time_str: str):
+        split_characters = [",", "and"]
+
+        for split_char in split_characters:
+            times_list = time_str.split(split_char)
+
+            if len(times_list) == 2:
+                return times_list
+
+        raise Exception("Can not split times string into list ", time_str)
 
     def _extract_hourly_rates(self):
         i = 0
