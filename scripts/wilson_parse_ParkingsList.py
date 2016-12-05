@@ -2,7 +2,7 @@ import os
 import pprint
 import sys
 import django
-
+from django.db.models.query_utils import Q
 
 sys.path.append('/carparker')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings.default")
@@ -30,5 +30,20 @@ for html_file in os.listdir(settings.HTML_CACHE_DIRECTORY):
         urls = parser.get_list(list_html)
 
         fullUrls = [webHome + '/park/' + url for url in urls]
+
+        alreadyThere = Parking.objects.filter(Q(uri__in=fullUrls))
+
+        # Remove from url list all parkings already in database
+        for parking in alreadyThere:
+            fullUrls.remove(parking.uri)
+
+        #notThere = Parking.objects.filter(~Q(uri__in=fullUrls))
+        #notThere = Parking.objects.exclude(uri__in=fullUrls)
+        # TODO: Disable the rest parkings in database (Implement enable field)
+
+        # Add the rest of url list to database
+        for fullUrl in fullUrls:
+            p = Parking(uri=fullUrl)
+            p.save()
 
         pprint.pprint(fullUrls)

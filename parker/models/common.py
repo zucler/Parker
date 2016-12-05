@@ -14,6 +14,7 @@ RATE_TYPES = (
 
 class Parking(models.Model):
     parkingID = models.AutoField(primary_key=True, unique=True)
+    #enabled = models.BooleanField(default=False)
     label = models.CharField(max_length=500)
     address = models.TextField(default="")
     lat = models.DecimalField(max_digits=10, decimal_places=6, default=0)
