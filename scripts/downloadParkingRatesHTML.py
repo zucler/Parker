@@ -5,7 +5,7 @@ from contextlib import closing
 from selenium.webdriver import PhantomJS
 
 sys.path.append('/carparker')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "parker.settings")
 
 import parker.wsgi
 from parker.models.common import Parking
